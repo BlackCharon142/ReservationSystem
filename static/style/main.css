@@ -135,7 +135,7 @@ body {
 }
 
 .notify {
-    animation: slideIn 0.5s forwards, slideOut 0.5s forwards 3s;
+    animation: slideIn 0.5s forwards, slideOut 0.5s forwards 20s;
 }
 
 .notif svg {

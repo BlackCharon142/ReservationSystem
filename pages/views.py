@@ -14,6 +14,7 @@ class LoginViewPage(LoginView):
     template_name = 'index.htm'
     form_class = LoginForm
 
+
 @login_required
 def logout(request):
     from django.contrib.auth import logout
@@ -21,6 +22,7 @@ def logout(request):
 
     logout(request)
     return redirect('/')
+
 
 def user_password_recovery(request):
     if request.method == "POST":
@@ -47,21 +49,26 @@ def user_password_recovery(request):
                 request,
                 "Thank you. If your answers match one of our records, an administrator will contact you shortly."
             )
-            return redirect('user-password-recovery')
+            return render(request, template_name="user-password-recovery.htm",
+                          context={'form': form, 'notification': True, 'notification_status': True,
+                                   'notification_message': 'با موفقیت ثبت شد!'})
     else:
         form = RecoveryForm()
 
     return render(request, template_name="user-password-recovery.htm", context={'form': form})
+
 
 @login_required
 def dashboard(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
     return render(request, template_name="dashboard.htm", context={'profile': profile})
 
+
 @login_required
 def reserve(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
     return render(request, template_name="reserve.htm", context={'profile': profile})
+
 
 @login_required
 def reserved(request):
