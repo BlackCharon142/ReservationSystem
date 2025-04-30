@@ -1,0 +1,180 @@
+.login-wrapper {
+    background-color: white;
+    /* White background for the form */
+    display: flex;
+    position: relative;
+    width: 80%;
+    /* Desired width of the login form */
+    max-width: 1200px;
+    min-height: 500px;
+    /* Desired height */
+    overflow: hidden;
+    border-radius: 25px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 20px;
+}
+
+.login-banner {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    background-image: url('../images/login-banner.jpg');
+    /* Replace with your image URL */
+    background-size: cover;
+    background-position: center;
+}
+
+.login-banner::before {
+    content: '';
+    position: absolute;
+    /* Position overlay */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Full coverage */
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Black overlay with 50% opacity */
+    z-index: 1;
+    /* Behind the text */
+}
+
+.login-banner span {
+    color: white;
+    /* White background for the form */
+    position: relative;
+    /* Position the text above overlay */
+    z-index: 2;
+    /* Ensure text is above overlay */
+    font-size: 32px;
+    text-shadow: rgba(0, 0, 0, 1) 0 0 5px;
+}
+
+.login-form {
+    padding: 20px 40px;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    /* Ensure form is above the banner */
+}
+
+.login-form-title {
+    font-weight: 700;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.login-detail {
+    width: 100%;
+    text-align: center;
+}
+
+.login-detail label {
+    padding: 5px 0;
+    display: block;
+    width: 100%;
+    text-align: justify;
+}
+
+.login-detail input[type="text"],
+.login-detail input[type="password"] {
+    width: calc(100% - 22px);
+    /* Full width input */
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #D9D9D9;
+    border: 1px solid #000;
+    border-radius: 5px;
+    text-align: right;
+    /* Align input text to the right */
+    font-size: 14px;
+}
+
+.login-detail input[type="submit"] {
+    margin-top: 35px;
+    min-width: 20%;
+    width: 100%;
+    max-width: 120px;
+    background-color: #FF8500;
+    /* orange button */
+    border: none;
+    border-radius: 5px;
+    padding: 7px 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.login-detail input[type="submit"]:hover {
+    background-color: #f78001;
+    /* Darker orange on hover */
+}
+
+.recover-detail {
+    margin-top: 45px;
+    text-align: center;
+    /* Center align the recovery text */
+}
+
+.recover-detail a {
+    display: block;
+    font-size: small;
+    margin-top: 10px;
+    color: #3876A9;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.recover-detail a:hover {
+    color: #2a5274;
+}
+
+@media (max-width: 750px) {
+    .login-wrapper {
+        min-width: 370px;
+        background-image: url('../images/login-banner.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .login-wrapper .text {
+        color: white;
+    }
+
+    .login-wrapper::before {
+        content: '';
+        position: absolute;
+        /* Position overlay */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* Full coverage */
+        background-color: rgba(0, 0, 0, 0.8);
+        /* Black overlay with 50% opacity */
+        z-index: 1;
+        /* Behind the text */
+    }
+
+    .login-form {
+        max-width: 280px;
+        flex: 1;
+        margin: 0 auto;
+    }
+
+    .login-banner {
+        display: none;
+    }
+
+    .login-detail input[type="text"],
+    .login-detail input[type="password"] {
+        color: #000;
+    }
+}

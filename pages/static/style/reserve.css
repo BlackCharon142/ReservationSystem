@@ -1,0 +1,160 @@
+.mpdatepicker{
+    text-align: center;
+    font-family: "VazirmatnFD";
+    border-radius: 5px;
+    background-color: #fff !important;
+    padding-top: 12px !important;
+    padding-left: 40px !important;
+    background-position-y: 9px !important;
+    background-position-x: 12px !important;
+    filter: hue-rotate(189deg);
+    margin-bottom: 20px;
+}
+
+#mpyear input{
+    font-family: "VazirmatnFD";
+}
+
+#mpdatepicker-block{
+    font-family: "VazirmatnFD" !important;
+    padding-top: 0 !important;
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+
+.mp-today-td, .mp-today{
+    text-shadow: none !important;
+    color: #FFA500 !important;
+}
+
+.mpheader{
+    background-color: #FFA500;
+    margin-top: 0 !important;
+    padding: 20px 0;
+}
+
+#mpyear input:focus{
+    outline: 1px solid black !important;
+}
+
+#mpyear input{
+    border-radius: 3px;
+}
+
+#mpmonth ul li:hover, #mpmonth:hover, .mpbtn:hover, #mpdatepicker-block table td:hover, .mp-footer a:hover{
+    border-radius: 3px;
+    background-color: #FAEADA !important;
+}
+
+.mp-footer a {
+    border-radius: 3px;
+}
+
+.mp-picked{
+    border: #FFA500 solid 2px !important;
+}
+
+
+.reserve-form{
+    text-align: center;
+}
+
+.date-meal-menu {
+    width: 70vw;
+    min-width: 700px;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.date-meal-header {
+    position: relative;
+    background-color: #D9D9D9; /* Light background for header */
+    font-weight: bold;
+}
+
+.date-meal-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid #000; /* Change color and size as needed */
+    border-radius: 10px 10px 0 0;
+    pointer-events: none; /* Allows clicks to pass through */
+}
+
+.date-meal-header tr th {
+    text-align: right; /* Center text */
+    padding: 20px 0;
+}
+
+.date-meal-header tr th:last-child {
+    text-align: center;
+}
+
+.date-meal-row {
+    border-bottom: 1px solid #ccc; /* Separator line between meals */
+    padding: 10px;
+    height: 90px;
+}
+
+.date-meal-row:last-child{
+    border-bottom: 0;
+}
+
+.date-meal-row img {
+    width: 50px; /* Specify width for the image */
+    height: 50px; /* Specify height for the image */
+    margin-right: 10px; /* Space between image and text */
+    margin-bottom: -8px;
+}
+
+.date-meal-name,
+.date-meal-description,
+.date-meal-price {
+    flex: 1; /* Equal width for meal details */
+    text-align: right; /* Center text */
+}
+
+.counter {
+    font-family: "VazirmatnFD";
+    display: flex;
+    overflow: hidden;
+    margin: 0 auto;
+    width: 110px;
+    align-items: center;
+    justify-content: center; /* Center the counter */
+    border: 1px solid #ccc; /* Optional: give some visual separation */
+    border-radius: 5px;
+    background-color: #fff; /* Optional: background for counter */
+}
+
+.increment, .decrement{
+    border: 0;
+    transition: all 0.2s;
+    width: 30px;
+    padding: 10px;
+    font-size: 1.2em;
+    cursor: pointer; /* Change cursor on hover */
+}
+
+.decrement{
+    background-color: #f04040;
+}
+
+.increment{
+    background-color: #53c253;
+}
+
+.number {
+    font-size: 24px;
+    margin: 0 auto; /* Space around the number */
+}
+
+/* Optional: Hover effect for buttons */
+.increment:hover, .decrement:hover {
+    background-color: #e0e0e0; /* Light grey on hover */
+}

@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 900; /* Black */
+    src: url('../fonts/Vazirmatn-FD-Black.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 700; /* Bold */
+    src: url('../fonts/Vazirmatn-FD-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 800; /* ExtraBold */
+    src: url('../fonts/Vazirmatn-FD-ExtraBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 200; /* ExtraLight */
+    src: url('../fonts/Vazirmatn-FD-ExtraLight.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 300; /* Light */
+    src: url('../fonts/Vazirmatn-FD-Light.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 500; /* Medium */
+    src: url('../fonts/Vazirmatn-FD-Medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 400; /* Regular */
+    src: url('../fonts/Vazirmatn-FD-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 600; /* SemiBold */
+    src: url('../fonts/Vazirmatn-FD-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'VazirmatnFD';
+    font-weight: 100; /* Thin */
+    src: url('../fonts/Vazirmatn-FD-Thin.woff2') format('woff2');
+}
+
+::selection {
+    background-color: #00000000; /* Highlight background */
+    color: inherit;            /* Highlighted text color */
+}
+
+html, body {
+    height: 100%; /* Set html and body to 100% height */
+    margin: 0;    /* Remove default margin */
+}
+
+/* Reset some default styles */
+body {
+    direction: rtl;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background-color: #F6F7FB; /* Optional: background for the body */
+}
+
+.text {
+    text-align: right; /* Align text to the right */
+    font-size: 16px;
+    font-family: "Vazirmatn", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.previous-page{
+    margin-top: 40px;
+    border: 0;
+    background-color: #f04040;
+    color: #fff;
+    padding: 10px 40px;
+    border-radius: 25px;
+    transition: all 0.2s;
+}
+
+.previous-page:hover{
+    cursor: pointer;
+    background-color: #cc3737;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translate(-50%, 50%);
+    }
+}
+
+.notif {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    bottom: 13px;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    height: 50px;
+    width: 250px;
+    box-sizing: border-box;
+    text-align: right;
+    overflow: hidden;
+    border-radius: 25px;
+    opacity: 0;
+}
+
+.notify {
+    animation: slideIn 0.5s forwards, slideOut 0.5s forwards 3s;
+}
+
+.notif svg {
+    margin-right: -25px;
+    width: auto;
+    height: 20px;
+}
+
+.notif.success {
+    background-color: #53c253;
+    color: #fff;
+    fill: #fff;
+}
+
+.notif.error {
+    background-color: #f04040;
+    color: #fff;
+    fill: #fff;
+}

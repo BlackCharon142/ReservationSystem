@@ -1,0 +1,212 @@
+.mpdatepicker {
+    text-align: center;
+    font-family: "VazirmatnFD";
+    border-radius: 5px;
+    background-color: #fff !important;
+    padding-top: 12px !important;
+    padding-left: 40px !important;
+    background-position-y: 9px !important;
+    background-position-x: 12px !important;
+    filter: hue-rotate(189deg);
+    margin-bottom: 20px;
+}
+
+#mpyear input {
+    font-family: "VazirmatnFD";
+}
+
+#mpdatepicker-block {
+    font-family: "VazirmatnFD" !important;
+    padding-top: 0 !important;
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+
+.mp-today-td,
+.mp-today {
+    text-shadow: none !important;
+    color: #FFA500 !important;
+}
+
+.mpheader {
+    background-color: #FFA500;
+    margin-top: 0 !important;
+    padding: 20px 0;
+}
+
+#mpyear input:focus {
+    outline: 1px solid black !important;
+}
+
+#mpyear input {
+    border-radius: 3px;
+}
+
+#mpmonth ul li:hover,
+#mpmonth:hover,
+.mpbtn:hover,
+#mpdatepicker-block table td:hover,
+.mp-footer a:hover {
+    border-radius: 3px;
+    background-color: #FAEADA !important;
+}
+
+.mp-footer a {
+    border-radius: 3px;
+}
+
+.mp-picked {
+    border: #FFA500 solid 2px !important;
+}
+
+.date-picker-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.clear-date {
+    position: absolute;
+    top: 35%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    font-size: 1.5em;
+    line-height: 1;
+    cursor: pointer;
+    display: none;
+    /* hidden by default */
+    color: #F04040;
+    padding: 0;
+}
+
+.current-reserved-meals {
+    text-align: center;
+}
+
+.current-reserved-meals-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: row;
+    gap: 15px;
+    min-width: 300px;
+    max-width: 1300px;
+    min-height: 400px;
+}
+
+.meal {
+    width: 300px;
+    height: 400px;
+}
+
+.meal {
+    transition: opacity .2s ease;
+}
+
+.meal[style*="display: none"] {
+    opacity: 0;
+}
+
+.meal-image-code {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+}
+
+.meal-image-container,
+.meal-code {
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    backface-visibility: hidden;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+.meal-image-container:hover,
+.meal-code:hover {
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+.meal-image-container {
+    background-color: #fff;
+}
+
+.meal-code {
+    background-color: #fff;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.meal-code svg {
+    display: block;
+    margin: 0 auto;
+    width: 80%;
+    height: auto;
+    fill: #000;
+}
+
+.meal-code-number {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.meal-image {
+    width: 80%;
+    height: auto;
+    filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.4));
+}
+
+.meal-detail,
+.meal-code-number {
+    margin-top: 20px;
+}
+
+.meal-detail span {
+    display: block;
+    text-align: right;
+    margin-top: 10px;
+}
+
+.meal-name,
+.meal-code-number {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.meal-description,
+.meal-expiration {
+    font-size: 14px;
+}
+
+.toggle-code:checked+.meal-wrapper .meal-image-code {
+    transform: rotateY(180deg);
+}
+
+.meal-image-code {
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+
+hr {
+    width: 100%;
+    margin: 15px 0;
+    margin-bottom: 5px;
+    border: none;
+    border-top: 1px solid #ddd;
+}

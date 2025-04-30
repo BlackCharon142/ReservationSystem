@@ -1,0 +1,49 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% block extra_assets %}
+    <link rel="stylesheet" href="{% static "style/main.css" %}">
+    {% endblock %}
+
+    {% block header_css %}
+    <link rel="stylesheet" href="{% static "style/header.css" %}">
+    {% endblock %}
+
+    <title>{% block title %}My Site{% endblock %} - سلف شمسی پور</title>
+</head>
+<body>
+
+{% block header %}
+    <header class="main-header">
+        <div class="user-short-detail">
+            <img src="{% static "images/profile.webp" %}" class="user-profile-thumb">
+            <div class="user-name-welcome-container text">
+                <span class="user-name">ولادمیر زلنسکی</span>
+                <span class="welcome-message">خوش آمدید</span>
+            </div>
+        </div>
+        <span class="site-name text">سلف شمسی پور</span>
+        <div class="wallet-container">
+            <button class="wallet-recharge text">شارژ</button>
+            <div class="wallet-detail">
+                <span class="wallet text">کیف پول</span>
+                <span class="wallet-balance text">۵۰,۰۰۰</span>
+                <span class="currency text">تومان</span>
+            </div>
+            <button class="logout text">خروج</button>
+        </div>
+    </header>
+{% endblock %}
+
+
+{% block content %}
+
+{% endblock %}
+
+</body>
+</html>

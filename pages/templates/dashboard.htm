@@ -1,0 +1,105 @@
+{% extends "base.htm" %}
+{% load static %}
+
+{% block extra_assets %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "style/dashboard.css" %}">
+{% endblock %}
+
+{% block title %}داشبورد{% endblock %}
+
+{% block content %}
+    <div class="dashboard text">
+        <div class="current-meal">
+            <input type="checkbox" id="toggle-code" hidden>
+            <label for="toggle-code" class="current-meal-wrapper">
+                <div class="current-meal-image-code">
+                    <div class="current-meal-image-container">
+                        <img src="{% static "images/Gheimeh.png" %}" class="current-meal-image">
+                        <hr>
+                        <div class="current-meal-detail">
+                            <span class="current-meal-name">قرمه سبزی</span>
+                            <span class="current-meal-description">همراه با نوشیدنی و سالاد</span>
+                            <span class="current-meal-expiration">تاریخ انقضا: <strong>۱۴۰۴/۰۲/۱۵ |
+                                    ۱۸:۰۰</strong></span>
+                        </div>
+                    </div>
+                    <div class="current-meal-code">
+                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 600 600">
+                            <path d="M264 72h25v25h-25zm72 0h25v25h-25z" />
+                            <path d="M240 96h25v25h-25z" />
+                            <path d="M264 96h25v25h-25z" />
+                            <path d="M288 96h25v25h-25z" />
+                            <path d="M312 96h25v25h-25z" />
+                            <path d="M336 96h25v25h-25zm-96 24h25v25h-25z" />
+                            <path d="M264 120h25v25h-25z" />
+                            <path d="M240 144h25v25h-25z" />
+                            <path d="M264 144h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M336 144h25v25h-25zm-96 24h25v25h-25z" />
+                            <path d="M336 168h25v25h-25zm-96 24h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M336 192h25v25h-25zm-96 24h25v25h-25z" />
+                            <path d="M312 216h25v25h-25z" />
+                            <path d="M336 216h25v25h-25zM48 240h25v25H48zm48 0h25v25H96z" />
+                            <path d="M120 240h25v25h-25z" />
+                            <path d="M144 240h25v25h-25z" />
+                            <path d="M168 240h25v25h-25z" />
+                            <path d="M192 240h25v25h-25zm72 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M408 240h25v25h-25z" />
+                            <path d="M432 240h25v25h-25z" />
+                            <path d="M456 240h25v25h-25z" />
+                            <path d="M480 240h25v25h-25zM48 264h25v25H48zm72 0h25v25h-25zm96 0h25v25h-25z" />
+                            <path d="M240 264h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M480 264h25v25h-25z" />
+                            <path d="M504 264h25v25h-25z" />
+                            <path d="M528 264h25v25h-25zM48 288h25v25H48zm72 0h25v25h-25z" />
+                            <path d="M144 288h25v25h-25z" />
+                            <path d="M168 288h25v25h-25z" />
+                            <path d="M192 288h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M264 288h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
+                            <path d="M456 288h25v25h-25zm72 0h25v25h-25zM48 312h25v25H48z" />
+                            <path d="M72 312h25v25H72z" />
+                            <path d="M96 312h25v25H96zm48 0h25v25h-25zm72 0h25v25h-25z" />
+                            <path d="M240 312h25v25h-25z" />
+                            <path d="M264 312h25v25h-25zm144 0h25v25h-25z" />
+                            <path d="M432 312h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M504 312h25v25h-25z" />
+                            <path
+                                d="M528 312h25v25h-25zM48 336h25v25H48zm96 0h25v25h-25zm48 0h25v25h-25zm120 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
+                            <path d="M504 336h25v25h-25zm-264 24h25v25h-25z" />
+                            <path d="M264 360h25v25h-25z" />
+                            <path d="M288 360h25v25h-25z" />
+                            <path d="M312 360h25v25h-25z" />
+                            <path d="M336 360h25v25h-25z" />
+                            <path d="M360 360h25v25h-25z" />
+                            <path d="M384 360h25v25h-25zm96 0h25v25h-25zm-216 24h25v25h-25z" />
+                            <path d="M288 384h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M408 384h25v25h-25zm-168 24h25v25h-25z" />
+                            <path d="M264 408h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M336 408h25v25h-25z" />
+                            <path d="M360 408h25v25h-25z" />
+                            <path d="M384 408h25v25h-25zm72 0h25v25h-25z" />
+                            <path
+                                d="M480 408h25v25h-25zm48 0h25v25h-25zm-288 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
+                            <path d="M456 432h25v25h-25zm-216 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
+                            <path d="M480 456h25v25h-25zm-240 24h25v25h-25zm48 0h25v25h-25z" />
+                            <path
+                                d="M312 480h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zm-216 24h25v25h-25z" />
+                            <path d="M288 504h25v25h-25zm120 0h25v25h-25z" />
+                            <path d="M432 504h25v25h-25zm48 0h25v25h-25z" />
+                            <path d="M504 504h25v25h-25zm-264 24h25v25h-25zm48 0h25v25h-25z" />
+                            <path
+                                d="M312 528h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zM48 48v168h168V48H48zm144 144H72V72h120v120zM384 48v168h168V48H384zm144 144H408V72h120v120zM48 384v168h168V384H48zm144 144H72V408h120v120z" />
+                            <path d="M96 96h72v72H96zm336 0h72v72h-72zM96 432h72v72H96z" />
+                        </svg>
+                        <hr>
+                        <div class="current-meal-code-number">کد غذا<br>۱۲۳۴۵۶۷۸</div>
+                    </div>
+                </div>
+            </label>
+        </div>
+        <label for="toggle-code" class="receive-today-code">دریافت کد غذا</label>
+        <hr>
+        <button onclick="window.location.assign('{% url 'reserve' %}');" class="reserve-meal text">رزرو غذا</button>
+        <button onclick="window.location.assign('{% url 'reserved' %}');" class="reserved-meals text">وضعیت رزرو ها</button>
+    </div>
+{% endblock %}

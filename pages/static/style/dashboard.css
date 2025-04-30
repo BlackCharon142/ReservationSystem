@@ -1,0 +1,153 @@
+
+.dashboard {
+    width: 300px;
+    perspective: 1000px;
+}
+
+.current-meal-image-code {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+}
+
+.current-meal-image-container,
+.current-meal-code {
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    backface-visibility: hidden;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+.current-meal-image-container:hover,
+.current-meal-code:hover{
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+.current-meal-image-container {
+    background-color: #fff;
+}
+
+.current-meal-code {
+    background-color: #fff;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.current-meal-code svg {
+    display: block;
+    margin: 0 auto;
+    width: 80%;
+    height: auto;
+    fill: #000;
+}
+
+.current-meal-code-number {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.current-meal-image {
+    width: 80%;
+    height: auto;
+    filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.4));
+}
+
+.current-meal-detail,
+.current-meal-code-number {
+    margin-top: 20px;
+}
+
+.current-meal-detail span {
+    display: block;
+    text-align: right;
+    margin-top: 10px;
+}
+
+.current-meal-name,
+.current-meal-code-number {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.current-meal-description,
+.current-meal-expiration {
+    font-size: 14px;
+}
+
+.receive-today-code,
+.reserve-meal,
+.reserved-meals {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    /* ✅ Prevents padding from increasing width */
+    padding: 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    color: #111;
+    font-size: 16px;
+    text-align: center;
+    /* ✅ Ensures label text looks like a button */
+    cursor: pointer;
+    /* ✅ Optional: Makes it feel like a button */
+    transition: all 0.2s;
+}
+
+.receive-today-code {
+    margin-top: 20px;
+    background-color: #FFA500;
+    appearance: none;
+    /* remove default label appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.receive-today-code:hover {
+    background-color: #f78001;
+}
+
+.receive-today-code:active {
+    background-color: #cc6c05;
+}
+
+#toggle-code:checked+label .current-meal-image-code {
+    transform: rotateY(180deg);
+}
+
+.reserve-meal, .reserved-meals {
+    background-color: #414852;
+    color: white;
+    /* Blue */
+}
+
+.reserve-meal:hover, .reserved-meals:hover {
+    background-color: #2f343b;
+}
+
+.reserve-meal:active, .reserved-meals:active {
+    background-color: #1c1f24;
+}
+
+hr {
+    width: 100%;
+    margin: 15px 0;
+    margin-bottom: 5px;
+    border: none;
+    border-top: 1px solid #ddd;
+}

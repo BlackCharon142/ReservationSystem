@@ -1,0 +1,124 @@
+body {
+    padding: 150px 0 77px 0;
+    min-height: calc(100vh - 227px);
+    height: auto;
+}
+
+.main-header {
+    position: fixed; /* Fix the header at the top */
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff; /* Background color for the header */
+    padding: 10px 20px; /* Padding for the header */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between site name and wallet container */
+    align-items: center; /* Center items vertically */
+    z-index: 1000; /* Ensure the header stays above other elements */
+}
+
+.user-short-detail{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.user-profile-thumb{
+    height: 50px;
+    width: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 100%;
+}
+
+.user-name-welcome-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.user-name-welcome-container .user-name{
+    font-size: 18px;
+}
+
+.user-name-welcome-container .welcome-message{
+    font-size: 14px;
+}
+
+.site-name {
+    font-size: 24px; /* Adjust font size for the site name */
+    position: fixed;
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.wallet-container {
+    display: flex;
+    align-items: center; /* Center items vertically in the wallet container */
+}
+
+.wallet-recharge {
+    background-color: orange; /* Orange background for the recharge button */
+    color: black; /* White text color */
+    padding: 10px 20px; /* Padding for the button */
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Round corners */
+    cursor: pointer; /* Change cursor on hover */
+    margin: 0px 5px; /* Space between button and wallet detail box */
+    font-size: 18px; /* Font size for the button */
+    transition: all 0.2s;
+}
+
+.wallet-recharge:hover{
+    background-color: #df7606;
+}
+
+.wallet-detail {
+    background-color: #D9D9D9; /* Light background for wallet detail box */
+    padding: 5px; /* Padding for the box */
+    border: 1px solid #000; /* Light border */
+    border-radius: 5px; /* Round corners */
+    display: flex; /* Use flexbox for wallet detail layout */
+    cursor: default;
+    gap: 8px;
+    align-items: center; /* Center items vertically */
+}
+
+.wallet {
+    background-color: #414852; /* No background for the wallet button */
+    padding: 10px 8px;
+    margin-left: 5px;
+    border-radius: 5px;
+    border: none; /* Remove border */
+    color: white; /* Blue text color */
+    font-size: 16px; /* Font size */
+    transition: all 0.2s;
+}
+
+.wallet:hover{
+    background-color: #333a42;
+}
+
+.wallet-balance {
+    font-size: 20px; /* Larger font size for balance */
+    font-weight: bold; /* Bold text */
+}
+
+.currency {
+    font-size: 20px; /* Regular font size */
+    margin-left: 5px;
+}
+
+.logout{
+    background-color: black;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0px 5px;
+    font-size: 18px;
+    transition: all 0.2s;
+}
