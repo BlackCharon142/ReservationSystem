@@ -1,12 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 
 from django.contrib.auth import login, authenticate
-from pages.forms import LoginForm
+from pages.forms import LoginForm, RecoveryForm
 
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 
-from users.models import Profile
+from users.models import Profile, RecoveryRequest
 
 
 class LoginViewPage(LoginView):
@@ -22,7 +23,35 @@ def logout(request):
     return redirect('/')
 
 def user_password_recovery(request):
-    return render(request, template_name="user-password-recovery.htm")
+    if request.method == "POST":
+        form = RecoveryForm(request.POST)
+        if form.is_valid():
+            # Pull out the five answers
+            answers = {
+                f"security_answer_{i}": form.cleaned_data[f"answer_{i}"]
+                for i in range(1, 6)
+            }
+
+            # Find any profiles whose answers all match exactly
+            matches = Profile.objects.filter(**answers)
+
+            # Enqueue a RecoveryRequest for every matched user
+            for profile in matches:
+                RecoveryRequest.objects.create(
+                    user=profile.user,
+                    **answers
+                )
+
+            # Always show the same generic message, whether or not we found a match
+            messages.success(
+                request,
+                "Thank you. If your answers match one of our records, an administrator will contact you shortly."
+            )
+            return redirect('user-password-recovery')
+    else:
+        form = RecoveryForm()
+
+    return render(request, template_name="user-password-recovery.htm", context={'form': form})
 
 @login_required
 def dashboard(request):
