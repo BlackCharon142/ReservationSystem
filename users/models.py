@@ -7,6 +7,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='images/default-profile.webp', upload_to='images/profiles/')
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    wallet_balance = models.DecimalField(max_digits=30, decimal_places=0, default=0)
     security_answer_1 = models.CharField(max_length=255, blank=True)
     security_answer_2 = models.CharField(max_length=255, blank=True)
     security_answer_3 = models.CharField(max_length=255, blank=True)

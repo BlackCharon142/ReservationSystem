@@ -10,7 +10,7 @@ admin.site.register(Profile)
 class ProfileInlineForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('image','phone_number',
+        fields = ('image','phone_number', 'wallet_balance',
                   'security_answer_1','security_answer_2',
                   'security_answer_3','security_answer_4',
                   'security_answer_5')
@@ -52,6 +52,22 @@ admin.site.unregister(User)
 @admin.register(User)
 class UserAdmin(DefaultUserAdmin):
     inlines = (ProfileInline,)
+
+    # ========== OVERRIDE ADD USER FORM ==========
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),  # makes the form a bit wider
+            'fields': (
+                'username',
+                'first_name',  # show First name
+                'last_name',  # show Last name
+                'email',  # show Email address
+                'password1',
+                'password2',
+            ),
+        }),
+    )
+    # ============================================
     # So you see the avatar thumbnail already:
     list_display = DefaultUserAdmin.list_display + ('get_avatar_thumb',)
     readonly_fields = ('get_avatar_thumb',)

@@ -25,7 +25,7 @@
                 <img src="{{ profile.image.url }}" alt="Profile Picture" class="user-profile-thumb">
             {% endif %}
             <div class="user-name-welcome-container text">
-                <span class="user-name">ولادمیر زلنسکی</span>
+                <span class="user-name">{{ profile.user.first_name }} {{ profile.user.last_name }}</span>
                 <span class="welcome-message">خوش آمدید</span>
             </div>
         </div>
