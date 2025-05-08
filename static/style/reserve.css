@@ -60,6 +60,7 @@
 }
 
 .date-meal-menu {
+    min-height: 85px;
     width: 70vw;
     min-width: 700px;
     border-collapse: collapse;
@@ -89,6 +90,7 @@
 .date-meal-header tr th {
     text-align: right; /* Center text */
     padding: 20px 0;
+    width: calc(100% / 5);
 }
 
 .date-meal-header tr th:last-child {
@@ -117,6 +119,7 @@
 .date-meal-price {
     flex: 1; /* Equal width for meal details */
     text-align: right; /* Center text */
+    font-family: 'VazirmatnFD';
 }
 
 .counter {

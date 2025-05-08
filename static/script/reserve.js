@@ -26,18 +26,8 @@ function initCounter(counter) {
     }
 }
 
-document.querySelectorAll('.counter').forEach(initCounter);
+function updateCounters(){
+    document.querySelectorAll('.counter').forEach(initCounter);
+}
 
-/*document.getElementById('add-counter').addEventListener('click', () => {
-    const newCounter = document.createElement('div');
-    newCounter.className = 'counter';
-    newCounter.setAttribute('data-min', '0');
-    newCounter.setAttribute('data-max', '20');
-    newCounter.innerHTML = `
-        <button class="decrement">-</button>
-        <div class="number">0</div>
-        <button class="increment">+</button>
-    `;
-    document.getElementById('counters-container').appendChild(newCounter);
-    initCounter(newCounter); // Initialize the new counter
-});*/
+updateCounters();

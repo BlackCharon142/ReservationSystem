@@ -7,8 +7,13 @@ from pages.forms import LoginForm, RecoveryForm
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 
-from users.models import Profile, RecoveryRequest
+import jdatetime
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+
+from users.models import Profile, RecoveryRequest
+from daily_menus.models import DailyMenuItem
 
 class LoginViewPage(LoginView):
     template_name = 'index.htm'
@@ -67,7 +72,43 @@ def dashboard(request):
 @login_required
 def reserve(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
-    return render(request, template_name="reserve.htm", context={'profile': profile})
+    currentDate = jdatetime.datetime.now()
+    today_menu = DailyMenuItem.objects.filter(expiration_date__date=currentDate.date())
+    print(currentDate.date())
+    return render(request, template_name="reserve.htm", context={'profile': profile, 'todayMenu': today_menu, 'currentDate': currentDate.timestamp()})
+
+@require_GET
+def get_meals_by_timestamp(request):
+    try:
+        ts = request.GET.get('timestamp')
+        if not ts:
+            return JsonResponse({'error': 'Missing timestamp'}, status=400)
+
+        # Fix: Convert float string to int safely
+        try:
+            ts = int(float(ts))
+        except ValueError:
+            return JsonResponse({'error': 'Invalid timestamp format'}, status=400)
+        # Convert to datetime
+        dt = jdatetime.datetime.fromtimestamp(ts)
+        date = dt.date()  # only the date part
+
+        meals = DailyMenuItem.objects.filter(expiration_date__date=date)
+        print(date)
+        meal_data = []
+        for item in meals:
+            meal_data.append({
+                'id': item.id,
+                'name': item.food.name,
+                'description': "، ".join([str(s) for s in item.side_dishes.all()]),
+                'price': item.price,
+                'image_url': item.image.url,
+                'max_qty': item.max_purchasable_quantity,
+            })
+
+        return JsonResponse({'meals': meal_data})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 @login_required

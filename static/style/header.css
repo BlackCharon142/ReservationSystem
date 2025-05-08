@@ -102,6 +102,7 @@ body {
 }
 
 .wallet-balance {
+    font-family: 'VazirmatnFD';
     font-size: 20px; /* Larger font size for balance */
     font-weight: bold; /* Bold text */
 }

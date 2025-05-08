@@ -9,4 +9,5 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("reserve/", views.reserve, name="reserve"),
     path("reserved/", views.reserved, name="reserved"),
+    path('ajax/get-meals/', views.get_meals_by_timestamp, name='get_meals_by_timestamp'),
 ]

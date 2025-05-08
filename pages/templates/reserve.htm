@@ -1,5 +1,6 @@
 {% extends "base.htm" %}
 {% load static %}
+{% load humanize %}
 
 {% block extra_assets %}
     {{ block.super }}
@@ -16,7 +17,7 @@
 {% block content %}
     <div class="reserve-form">
         <div class="date-selection">
-            <input type="text" placeholder="تاریخ مورد نظر را انتخاب کنید" class="date-picker text" value="" />
+            <input type="text" id="myDate" placeholder="تاریخ مورد نظر را انتخاب کنید" class="date-picker text" value="" />
         </div>
         <table class="date-meal-menu text">
             <thead class="date-meal-header">
@@ -29,19 +30,21 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="date-meal-row" data-meal-id>
-                    <td><img src="{% static "images/Gheimeh.png" %}"></td>
-                    <td class="date-meal-name">خورشت قیمه</td>
-                    <td class="date-meal-description">همراه با نوشیدنی و ماست</td>
-                    <td class="date-meal-price">۲۰,۰۰۰<span> تومان</span></td>
+            {% for item in todayMenu %}
+                <tr class="date-meal-row" data-meal-id="{{ item.id }}">
+                    <td><img src="{{ item.image.url }}"></td>
+                    <td class="date-meal-name">{{ item.food.name }}</td>
+                    <td class="date-meal-description">{{ item.side_dishes.all|join:"، " }}</td>
+                    <td class="date-meal-price">{{ item.price|intcomma }}<span> تومان</span></td>
                     <td>
-                        <div class="counter" data-min="0" data-max="10">
+                        <div class="counter" data-min="0" data-max="{{ item.max_purchasable_quantity }}">
                             <button class="decrement">-</button>
                             <div class="number">0</div>
                             <button class="increment">+</button>
                         </div>
                     </td>
                 </tr>
+            {% endfor %}
             </tbody>
         </table>
         <button onclick="window.location.assign('{% url 'dashboard' %}');" class="previous-page text">برگشت</button>
@@ -57,15 +60,70 @@
                     console.log('open');
                 },
                 onSelect: function (selected) {
-                    console.log('select', selected);
+                    console.log('select',selected);
                 },
                 onChange: function (oldVal, newVal) {
-                    console.log('change', oldVal, newVal);
+                    console.log('change',oldVal,newVal)
+                    const timestamp = newVal;
+                    if (timestamp && timestamp !== "null") {
+                        fetchMealsForDate(timestamp);
+                    }
                 },
                 onClose: function () {
                     console.log('close');
                 },
             });
+        });
+
+        function fetchMealsForDate(timestamp) {
+            fetch(`/ajax/get-meals/?timestamp=${timestamp}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.meals) {
+                        updateMealTable(data.meals);
+                    } else {
+                        updateMealTable([]);
+                        console.error(data.error || 'No meals found');
+                    }
+                })
+                .catch(err => console.error('AJAX error:', err));
+        }
+
+        function updateMealTable(meals) {
+            const tbody = document.querySelector('.date-meal-menu tbody');
+            tbody.innerHTML = ''; // clear old rows
+
+            meals.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'date-meal-row';
+                tr.dataset.mealId = item.id;
+
+                tr.innerHTML = `
+                    <td><img src="${item.image_url}" /></td>
+                    <td class="date-meal-name">${item.name}</td>
+                    <td class="date-meal-description">${item.description}</td>
+                    <td class="date-meal-price">${item.price} <span>تومان</span></td>
+                    <td>
+                        <div class="counter" data-min="0" data-max="${item.max_qty}">
+                            <button class="decrement">-</button>
+                            <div class="number">0</div>
+                            <button class="increment">+</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateCounters();
+        }
+
+
+        $(function(){
+            const ts    = {{ currentDate }};
+            const pDate = $.mpdt.pTimestamp2Date(ts);
+            $('#myDate')
+                .val(pDate)
+                .attr('data-timestamp', ts)
+                .trigger('change');
         });
     </script>
 {% endblock %}

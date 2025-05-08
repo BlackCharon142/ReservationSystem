@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 
 <!DOCTYPE html>
 <html lang="fa">
@@ -34,7 +35,7 @@
             <button class="wallet-recharge text">شارژ</button>
             <div class="wallet-detail">
                 <span class="wallet text">کیف پول</span>
-                <span class="wallet-balance text">۵۰,۰۰۰</span>
+                <span class="wallet-balance text">{{ profile.wallet_balance|intcomma }}</span>
                 <span class="currency text">تومان</span>
             </div>
             <button class="logout text" onclick="window.location.assign('{% url 'logout' %}');">خروج</button>

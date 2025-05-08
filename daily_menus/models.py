@@ -15,16 +15,21 @@ class DailyMenuItem(models.Model):
 
     objects = jmodels.jManager()
     # Expiration date with Persian calendar picker
+    reservation_deadline = jmodels.jDateTimeField(blank=True, null=True)  # DateTime field for deadline
     expiration_date = jmodels.jDateTimeField()  # DateTime field for expiration
+
+    price = models.DecimalField(max_digits=30, decimal_places=0, default=0)
 
     def save(self, *args, **kwargs):
         if not self.image:
             self.image = self.food.image
+        if not self.reservation_deadline:
+            self.reservation_deadline = self.expiration_date
         super().save(*args, **kwargs)
 
     def __str__(self):
         side_dishes_names = ", ".join([side_dish.name for side_dish in self.side_dishes.all()])
-        return "%s & %s - Side Dishes: (%s) - Expiry: %s" % (
+        return "%s & %s - Side Dishes: (%s) - Expiry: (%s)" % (
         self.food.name, self.drink.name, side_dishes_names, self.expiration_date)
         #return f"{self.food.name} & {self.drink.name} - Expire: {self.expiration_date}"
 
