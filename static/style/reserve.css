@@ -82,7 +82,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    border: 1px solid #000; /* Change color and size as needed */
+    border: 1px solid #c6c6c6; /* Change color and size as needed */
     border-radius: 10px 10px 0 0;
     pointer-events: none; /* Allows clicks to pass through */
 }

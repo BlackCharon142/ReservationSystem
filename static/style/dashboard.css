@@ -1,11 +1,20 @@
 
 .dashboard {
-    width: 300px;
     perspective: 1000px;
 }
 
+.current-meal-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: row;
+    gap: 15px;
+    min-width: 300px;
+    max-width: 1300px;
+}
+
 .current-meal-image-code {
-    width: 100%;
+    width: 300px;
     height: 400px;
     position: relative;
     transform-style: preserve-3d;
@@ -87,6 +96,11 @@
 .current-meal-description,
 .current-meal-expiration {
     font-size: 14px;
+}
+
+.button-container{
+    width: 300px;
+    margin: auto;
 }
 
 .receive-today-code,

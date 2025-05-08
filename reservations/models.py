@@ -29,8 +29,7 @@ class Reservation(models.Model):
     # Validator to ensure exactly 8 digits
     reservation_code = models.CharField(
         max_length=8,
-        validators=[RegexValidator(regex=r'^\d{8}$', message='Code must be exactly 8 digits')],
-        unique=True
+        validators=[RegexValidator(regex=r'^\d{8}$', message='Code must be exactly 8 digits')]
     )
 
     objects = jmodels.jManager()

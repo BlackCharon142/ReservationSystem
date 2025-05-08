@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Q, Count, Case, When, IntegerField, F
+from django.db.models import Q, Count, Case, When, IntegerField, F, Exists, OuterRef
+from collections import Counter
 
 from django.contrib.auth import login, authenticate
 from pages.forms import LoginForm, RecoveryForm
@@ -20,6 +21,10 @@ import hashlib, random
 from users.models import Profile, RecoveryRequest
 from daily_menus.models import DailyMenuItem
 from reservations.models import Reservation, Status
+
+import io
+import qrcode
+from qrcode.image.svg import SvgPathImage
 
 class LoginViewPage(LoginView):
     template_name = 'index.htm'
@@ -71,8 +76,55 @@ def user_password_recovery(request):
 
 @login_required
 def dashboard(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
-    return render(request, template_name="dashboard.htm", context={'profile': profile})
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+
+    # 2) grab ALL reservations for today’s date (by expiration_date)
+    today_qs = Reservation.objects.filter(
+        user=request.user,
+        dailymenu__expiration_date__date=jdatetime.date.today()
+    )
+
+    # 3) split into reserved vs canceled
+    reserved_qs = today_qs.filter(status__status='reserved')
+    canceled_qs = today_qs.filter(status__status='canceled')
+
+    # 4) count net per code
+    reserved_counts = Counter(reserved_qs.values_list('reservation_code', flat=True))
+    canceled_counts = Counter(canceled_qs.values_list('reservation_code',  flat=True))
+
+    # 5) keep only codes with net>0
+    active_codes = [
+        code for code, cnt in reserved_counts.items()
+        if cnt > canceled_counts.get(code, 0)
+    ]
+
+    # 6) for each code, pick its most recent “reserved” record
+    active_today = []
+    for code in active_codes:
+        rec = (
+            reserved_qs
+            .filter(reservation_code=code)
+            .order_by('-date_status_updated')
+            .first()
+        )
+        if rec:
+            active_today.append(rec)
+
+    # 7) generate inline SVG QR for each
+    for res in active_today:
+        qr = qrcode.QRCode(box_size=4, border=1)
+        qr.add_data(res.reservation_code)
+        qr.make(fit=True)
+        img = qr.make_image(image_factory=SvgPathImage)
+
+        buf = io.BytesIO()
+        img.save(buf)
+        res.qr_svg = buf.getvalue().decode('utf-8')
+
+    return render(request, "dashboard.htm", {
+        'profile':      profile,
+        'today_reservations': active_today,
+    })
 
 @login_required
 def ajax_wallet_balance(request):
@@ -116,8 +168,7 @@ def reserve(request):
 
     # Now inject max_purchasable_quantity = 0 if past deadline, and reserve_count
     for item in today_menu:
-        if item.reservation_deadline <= timezone.make_aware(
-                item.reservation_deadline.togregorian(), timezone.get_current_timezone()):
+        if item.reservation_deadline <= timezone.make_aware(jdatetime.datetime.now()):
             item.max_purchasable_quantity = 0
         item.reserved_count = reserved_map.get(item.id, 0)
 
@@ -254,31 +305,47 @@ def ajax_reserve(request):
 @login_required
 @require_POST
 def ajax_cancel(request):
-    user = request.user
+    user    = request.user
     menu_id = request.POST.get('menu_id')
     try:
         menu_item = DailyMenuItem.objects.select_for_update().get(pk=int(menu_id))
     except (ValueError, DailyMenuItem.DoesNotExist):
         return JsonResponse({'error': 'Invalid menu item.'}, status=400)
 
+    # 1) build counters of reserved vs. canceled codes for this user & menu
+    reserved_qs = Reservation.objects.filter(
+        user=user,
+        dailymenu=menu_item,
+        status__status='reserved'
+    ).order_by('date_status_updated')
+    canceled_qs = Reservation.objects.filter(
+        user=user,
+        dailymenu=menu_item,
+        status__status='canceled'
+    )
+
+    reserved_codes = [r.reservation_code for r in reserved_qs]
+    canceled_codes = [r.reservation_code for r in canceled_qs]
+
+    res_count = Counter(reserved_codes)
+    can_count = Counter(canceled_codes)
+
+    # 2) pick the most recent code whose net > 0
+    #    (iterate reserved_qs in reverse chronological order)
+    code_to_cancel = None
+    for r in reversed(reserved_qs):
+        code = r.reservation_code
+        if res_count[code] > can_count.get(code, 0):
+            code_to_cancel = code
+            break
+
+    if not code_to_cancel:
+        return JsonResponse({'error': 'No active reservation to cancel.'}, status=400)
+
     canceled_status = Status.objects.get(status='canceled')
 
-    # find one existing 'reserved' reservation to cancel, for this user & item & date
-    orig = (Reservation.objects
-            .filter(user=user, dailymenu=menu_item, status__status='reserved',
-                    dailymenu__expiration_date=menu_item.expiration_date)
-            .order_by('-date_status_updated')
-            .first())
-    if not orig:
-        return JsonResponse({'error': 'No active reservation found.'}, status=400)
-
-    # generate a new code for the cancellation record
-    raw = f"{user.id}-{menu_id}-cancel-{timezone.now().timestamp()}-{random.random()}"
-    num = int(hashlib.sha256(raw.encode()).hexdigest(), 16) % 10**8
-    code = f"{num:08d}"
-
+    # 3) perform the cancel: restore stock & wallet, then record the cancel
     with transaction.atomic():
-        # restore stock & wallet
         menu_item.quantity += 1
         menu_item.save()
 
@@ -290,12 +357,63 @@ def ajax_cancel(request):
             user=user,
             dailymenu=menu_item,
             status=canceled_status,
-            reservation_code=code
+            reservation_code=code_to_cancel
         )
 
-    return JsonResponse({'success': True, 'new_qty': menu_item.quantity, 'code': code})
+    return JsonResponse({
+        'success': True,
+        'new_qty': menu_item.quantity,
+        'code': code_to_cancel
+    })
 
 @login_required
 def reserved(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
-    return render(request, template_name="reserved.htm", context={'profile': profile})
+
+    future_qs = Reservation.objects.filter(
+        user=request.user,
+        dailymenu__expiration_date__gt=jdatetime.datetime.now()
+    )
+
+    # 3) Split into reserved vs canceled
+    reserved_qs = future_qs.filter(status__status='reserved')
+    canceled_qs = future_qs.filter(status__status='canceled')
+
+    # 4) Count codes
+    reserved_counts = Counter(reserved_qs.values_list('reservation_code', flat=True))
+    canceled_counts = Counter(canceled_qs.values_list('reservation_code',  flat=True))
+
+    # 5) Which codes still have net > 0?
+    active_codes = [
+        code
+        for code, cnt in reserved_counts.items()
+        if cnt > canceled_counts.get(code, 0)
+    ]
+
+    # 6) For each active code, grab its latest “reserved” record
+    active_reservations = []
+    for code in active_codes:
+        rec = (
+            reserved_qs
+            .filter(reservation_code=code)
+            .order_by('-date_status_updated')
+            .first()
+        )
+        if rec:
+            active_reservations.append(rec)
+
+    # 7) Generate SVG QR for each
+    for res in active_reservations:
+        qr = qrcode.QRCode(box_size=4, border=1)
+        qr.add_data(res.reservation_code)
+        qr.make(fit=True)
+        img = qr.make_image(image_factory=SvgPathImage)
+
+        buf = io.BytesIO()
+        img.save(buf)
+        res.qr_svg = buf.getvalue().decode('utf-8')
+
+    return render(request, "reserved.htm", {
+        'reservations': active_reservations,
+        'profile': profile,
+    })
