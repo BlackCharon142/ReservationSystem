@@ -81,7 +81,7 @@ body {
 .text {
     text-align: right; /* Align text to the right */
     font-size: 16px;
-    font-family: "Vazirmatn", sans-serif;
+    font-family: "VazirmatnFD", "Vazirmatn", sans-serif;
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;

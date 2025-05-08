@@ -262,6 +262,28 @@ def ajax_reserve(request):
     if user.profile.wallet_balance < menu_item.price:
         return JsonResponse({'error': 'Insufficient balance.'}, status=400)
 
+    today = menu_item.expiration_date.date()  # same date you use elsewhere
+
+    qs = Reservation.objects.filter(
+        user=user,
+        dailymenu=menu_item,
+        dailymenu__expiration_date__date=today,
+    ).aggregate(
+        reserved=Count(
+            Case(When(status__status='reserved', then=1)),
+            output_field=IntegerField()
+        ),
+        canceled=Count(
+            Case(When(status__status='canceled', then=1)),
+            output_field=IntegerField()
+        )
+    )
+    net = (qs['reserved'] or 0) - (qs['canceled'] or 0)
+    if net > menu_item.max_purchasable_quantity:
+        return JsonResponse({
+            'error': f'You may only reserve up to {menu_item.max_purchasable_quantity} of this item today.'
+        }, status=400)
+
     reserved_status = Status.objects.get(status='reserved')
 
     # generate per-user-item-day code
@@ -311,6 +333,28 @@ def ajax_cancel(request):
         menu_item = DailyMenuItem.objects.select_for_update().get(pk=int(menu_id))
     except (ValueError, DailyMenuItem.DoesNotExist):
         return JsonResponse({'error': 'Invalid menu item.'}, status=400)
+
+    today = menu_item.expiration_date.date()  # same date you use elsewhere
+
+    qs = Reservation.objects.filter(
+        user=user,
+        dailymenu=menu_item,
+        dailymenu__expiration_date__date=today,
+    ).aggregate(
+        reserved=Count(
+            Case(When(status__status='reserved', then=1)),
+            output_field=IntegerField()
+        ),
+        canceled=Count(
+            Case(When(status__status='canceled', then=1)),
+            output_field=IntegerField()
+        )
+    )
+    net = (qs['reserved'] or 0) - (qs['canceled'] or 0)
+    if net < 0:
+        return JsonResponse({
+            'error': f'you cant cancel what you havent bought.'
+        }, status=400)
 
     # 1) build counters of reserved vs. canceled codes for this user & menu
     reserved_qs = Reservation.objects.filter(

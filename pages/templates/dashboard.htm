@@ -27,9 +27,9 @@
                       {{ res.dailymenu.side_dishes.all|join:"، " }}
                     </span>
                     <span class="meal-expiration" data-timestamp="{{ res.dailymenu.expiration_date.timestamp }}">
-                      قابل استفاده در تاریخ
-                      <strong>{{ res.dailymenu.expiration_date|date:"Y/m/d" }}</strong><br>
-                      تا ساعت
+                      تاریخ انقضا:
+                      <strong>{{ res.dailymenu.expiration_date|date:"Y/m/d" }}</strong>
+                        |
                       <strong>{{ res.dailymenu.expiration_date|time:"H:i" }}</strong>
                     </span>
                   </div>
