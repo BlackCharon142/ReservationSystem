@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from menu_items.models import Food, Drink, SideDish  # Import your models
+from menu_items.models import Food, Drink, SideDish
 from django_jalali.db import models as jmodels
 
 class DailyMenuItem(models.Model):

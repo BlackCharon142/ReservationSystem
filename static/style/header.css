@@ -60,6 +60,7 @@ body {
 }
 
 .wallet-recharge {
+    display: none;
     background-color: orange; /* Orange background for the recharge button */
     color: black; /* White text color */
     padding: 10px 20px; /* Padding for the button */

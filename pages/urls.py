@@ -10,4 +10,7 @@ urlpatterns = [
     path("reserve/", views.reserve, name="reserve"),
     path("reserved/", views.reserved, name="reserved"),
     path('ajax/get-meals/', views.get_meals_by_timestamp, name='get_meals_by_timestamp'),
+    path('ajax/reserve/',   views.ajax_reserve,   name='ajax_reserve'),
+    path('ajax/cancel/',    views.ajax_cancel,    name='ajax_cancel'),
+    path('ajax/wallet-balance/', views.ajax_wallet_balance, name='ajax_wallet_balance'),
 ]

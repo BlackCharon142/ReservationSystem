@@ -9,6 +9,18 @@
 
     {% block extra_assets %}
         <link rel="stylesheet" href="{% static "style/main.css" %}">
+        <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            document.cookie.split(';').forEach(c => {
+                const cookie = c.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+                }
+            });
+            return cookieValue;
+        }
+        </script>
     {% endblock %}
 
     {% block header_css %}
@@ -82,6 +94,6 @@
         element.classList.add('notify');
     </script>
 {% endif %}
-
+    <script src="{% static "script/header.js" %}"></script>
 </body>
 </html>

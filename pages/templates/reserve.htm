@@ -31,19 +31,26 @@
             </thead>
             <tbody>
             {% for item in todayMenu %}
-                <tr class="date-meal-row" data-meal-id="{{ item.id }}">
-                    <td><img src="{{ item.image.url }}"></td>
-                    <td class="date-meal-name">{{ item.food.name }}</td>
-                    <td class="date-meal-description">{{ item.side_dishes.all|join:"، " }}</td>
-                    <td class="date-meal-price">{{ item.price|intcomma }}<span> تومان</span></td>
-                    <td>
-                        <div class="counter" data-min="0" data-max="{{ item.max_purchasable_quantity }}">
-                            <button class="decrement">-</button>
-                            <div class="number">0</div>
-                            <button class="increment">+</button>
-                        </div>
-                    </td>
-                </tr>
+              <tr class="date-meal-row" data-meal-id="{{ item.id }}">
+                <td><img src="{{ item.image.url }}"></td>
+                <td class="date-meal-name">{{ item.food.name }}</td>
+                <td class="date-meal-description">{{ item.side_dishes.all|join:"، " }}</td>
+                <td class="date-meal-price">{{ item.price|intcomma }}<span> تومان</span></td>
+                <td>
+                  {% if item.max_purchasable_quantity > 0 %}
+                    <div
+                      class="counter"
+                      data-min="0"
+                      data-max="{{ item.max_purchasable_quantity }}"
+                      data-current="{{ item.reserved_count }}"
+                    >
+                      <button class="decrement">-</button>
+                      <div class="number">{{ item.reserved_count }}</div>
+                      <button class="increment">+</button>
+                    </div>
+                  {% endif %}
+                </td>
+              </tr>
             {% endfor %}
             </tbody>
         </table>
@@ -74,48 +81,6 @@
                 },
             });
         });
-
-        function fetchMealsForDate(timestamp) {
-            fetch(`/ajax/get-meals/?timestamp=${timestamp}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.meals) {
-                        updateMealTable(data.meals);
-                    } else {
-                        updateMealTable([]);
-                        console.error(data.error || 'No meals found');
-                    }
-                })
-                .catch(err => console.error('AJAX error:', err));
-        }
-
-        function updateMealTable(meals) {
-            const tbody = document.querySelector('.date-meal-menu tbody');
-            tbody.innerHTML = ''; // clear old rows
-
-            meals.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = 'date-meal-row';
-                tr.dataset.mealId = item.id;
-
-                tr.innerHTML = `
-                    <td><img src="${item.image_url}" /></td>
-                    <td class="date-meal-name">${item.name}</td>
-                    <td class="date-meal-description">${item.description}</td>
-                    <td class="date-meal-price">${item.price} <span>تومان</span></td>
-                    <td>
-                        <div class="counter" data-min="0" data-max="${item.max_qty}">
-                            <button class="decrement">-</button>
-                            <div class="number">0</div>
-                            <button class="increment">+</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            updateCounters();
-        }
-
 
         $(function(){
             const ts    = {{ currentDate }};
