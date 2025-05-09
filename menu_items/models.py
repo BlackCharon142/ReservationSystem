@@ -12,9 +12,15 @@ from django.templatetags.static import static
 class Food(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='images/food/', default='images/default-food.png')
+    image = models.ImageField(upload_to='images/food/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def image_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return static('images/default-food.png')
 
     def __str__(self):
         return self.name

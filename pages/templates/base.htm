@@ -34,8 +34,8 @@
 {% block header %}
     <header class="main-header">
         <div class="user-short-detail">
-            {% if profile.image %}
-                <img src="{{ profile.image.url }}" alt="Profile Picture" class="user-profile-thumb">
+            {% if profile.image_url %}
+                <img src="{{ profile.image_url }}" alt="Profile Picture" class="user-profile-thumb">
             {% endif %}
             <div class="user-name-welcome-container text">
                 <span class="user-name">{{ profile.user.first_name }} {{ profile.user.last_name }}</span>

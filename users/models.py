@@ -1,11 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.templatetags.static import static
 from PIL import Image
+import os
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(default='images/default-profile.webp', upload_to='images/profiles/')
+    image = models.ImageField(upload_to='images/profiles/', blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     wallet_balance = models.DecimalField(max_digits=30, decimal_places=0, default=0)
     security_answer_1 = models.CharField(max_length=255, blank=True)
@@ -14,16 +16,25 @@ class Profile(models.Model):
     security_answer_4 = models.CharField(max_length=255, blank=True)
     security_answer_5 = models.CharField(max_length=255, blank=True)
 
+    @property
+    def image_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return static('images/default-profile.webp')
+
     def __str__(self):
         return f'{self.user.username} Profile'
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        img = Image.open(self.image.path)
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+
+        # Only process if an actual image is uploaded
+        if self.image and self.image.name and os.path.isfile(self.image.path):
+            img = Image.open(self.image.path)
+            if img.height > 300 or img.width > 300:
+                output_size = (300, 300)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
 
 
 class RecoveryRequest(models.Model):

@@ -15,7 +15,7 @@
 
 .current-meal-image-code {
     width: 300px;
-    height: 400px;
+    height: 430px;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s;
@@ -94,8 +94,25 @@
 }
 
 .current-meal-description,
-.current-meal-expiration {
+.current-meal-expiration,
+.current-meal-status{
     font-size: 14px;
+}
+
+.current-meal-status.reserved strong{
+    color: #14c440;
+}
+
+.current-meal-status.used strong{
+    color: #f19000;
+}
+
+.current-meal-status.canceled strong{
+    color: #ff0000;
+}
+
+.current-meal-status.expired strong{
+    color: #ff0000;
 }
 
 .button-container{

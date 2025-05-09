@@ -73,9 +73,9 @@ class UserAdmin(DefaultUserAdmin):
     readonly_fields = ('get_avatar_thumb',)
 
     def get_avatar_thumb(self, obj):
-        if hasattr(obj, 'profile') and obj.profile.image:
+        if hasattr(obj, 'profile') and obj.profile.image_url:
             return mark_safe(
-                f'<img src="{obj.profile.image.url}" width="40" height="40" '
+                f'<img src="{obj.profile.image_url}" width="40" height="40" '
                 'style="border-radius:50%;" />'
             )
         return "-"

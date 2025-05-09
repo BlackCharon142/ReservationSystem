@@ -32,7 +32,7 @@
             <tbody>
             {% for item in todayMenu %}
               <tr class="date-meal-row" data-meal-id="{{ item.id }}">
-                <td><img src="{{ item.image.url }}"></td>
+                <td><img src="{{ item.image_url }}"></td>
                 <td class="date-meal-name">{{ item.food.name }}</td>
                 <td class="date-meal-description">{{ item.side_dishes.all|join:"، " }}</td>
                 <td class="date-meal-price">{{ item.price|intcomma }}<span> تومان</span></td>

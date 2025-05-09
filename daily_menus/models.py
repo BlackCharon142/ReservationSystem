@@ -20,8 +20,14 @@ class DailyMenuItem(models.Model):
 
     price = models.DecimalField(max_digits=30, decimal_places=0, default=0)
 
+    @property
+    def image_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return self.food.image_url
+
     def save(self, *args, **kwargs):
-        if not self.image:
+        if not self.image and self.food.image:
             self.image = self.food.image
         if not self.reservation_deadline:
             self.reservation_deadline = self.expiration_date

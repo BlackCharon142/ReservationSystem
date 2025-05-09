@@ -73,7 +73,6 @@ def user_password_recovery(request):
 
     return render(request, template_name="user-password-recovery.htm", context={'form': form})
 
-
 @login_required
 def dashboard(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
@@ -98,11 +97,11 @@ def dashboard(request):
         if cnt > canceled_counts.get(code, 0)
     ]
 
-    # 6) for each code, pick its most recent “reserved” record
+    # 5) For each active code, grab its latest record from the full today_qs
     active_today = []
     for code in active_codes:
         rec = (
-            reserved_qs
+            today_qs
             .filter(reservation_code=code)
             .order_by('-date_status_updated')
             .first()
@@ -416,7 +415,7 @@ def reserved(request):
 
     future_qs = Reservation.objects.filter(
         user=request.user,
-        dailymenu__expiration_date__gt=jdatetime.datetime.now()
+        dailymenu__expiration_date__gt=jdatetime.datetime.now().date()
     )
 
     # 3) Split into reserved vs canceled
@@ -438,7 +437,7 @@ def reserved(request):
     active_reservations = []
     for code in active_codes:
         rec = (
-            reserved_qs
+            future_qs
             .filter(reservation_code=code)
             .order_by('-date_status_updated')
             .first()
@@ -456,6 +455,8 @@ def reserved(request):
         buf = io.BytesIO()
         img.save(buf)
         res.qr_svg = buf.getvalue().decode('utf-8')
+
+    print(active_reservations)
 
     return render(request, "reserved.htm", {
         'reservations': active_reservations,
