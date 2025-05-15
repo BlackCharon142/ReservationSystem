@@ -11,7 +11,7 @@ class Profile(models.Model):
     image = models.ImageField(upload_to='images/profiles/', blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     wallet_balance = models.DecimalField(max_digits=30, decimal_places=0, default=0)
-    allowed_meal_type = models.ManyToManyField(MealType, null=True)
+    allowed_meal_type = models.ManyToManyField(MealType, blank=True)
     security_answer_1 = models.CharField(max_length=255, blank=True)
     security_answer_2 = models.CharField(max_length=255, blank=True)
     security_answer_3 = models.CharField(max_length=255, blank=True)

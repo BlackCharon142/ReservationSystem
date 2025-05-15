@@ -92,6 +92,7 @@ function updateCounters(){
               <td><img src="${item.image_url}" /></td>
               <td class="date-meal-name">${item.name}</td>
               <td class="date-meal-description">${item.description}</td>
+              <td class="date-meal-type">${item.type}</td>
               <td class="date-meal-price">${item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} <span>تومان</span></td>
               <td>`;
 

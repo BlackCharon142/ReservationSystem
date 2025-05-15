@@ -25,6 +25,7 @@
                     <th></th>
                     <th>غذا</th>
                     <th>توضیحات</th>
+                    <th>وعده</th>
                     <th>قیمت</th>
                     <th>تعداد</th>
                 </tr>
@@ -35,6 +36,7 @@
                 <td><img src="{{ item.image_url }}"></td>
                 <td class="date-meal-name">{{ item.food.name }}</td>
                 <td class="date-meal-description">{{ item.side_dishes.all|join:"، " }}</td>
+                <td class="date-meal-type">{{ item.meal_type.title }}</td>
                 <td class="date-meal-price">{{ item.price|intcomma }}<span> تومان</span></td>
                 <td>
                   {% if item.max_purchasable_quantity > 0 %}

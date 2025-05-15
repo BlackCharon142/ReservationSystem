@@ -90,7 +90,30 @@
 .date-meal-header tr th {
     text-align: right; /* Center text */
     padding: 20px 0;
-    width: calc(100% / 5);
+}
+
+.date-meal-header tr th:nth-child(1){
+    width: 10%;
+}
+
+.date-meal-header tr th:nth-child(2){
+    width: 15%;
+}
+
+.date-meal-header tr th:nth-child(3){
+    width: 35%;
+}
+
+.date-meal-header tr th:nth-child(4){
+    width: 10%;
+}
+
+.date-meal-header tr th:nth-child(5){
+    width: 15%;
+}
+
+.date-meal-header tr th:nth-child(6){
+    width: 15%;
 }
 
 .date-meal-header tr th:last-child {

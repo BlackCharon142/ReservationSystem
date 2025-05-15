@@ -140,7 +140,8 @@ def reserve(request):
     currentDate = jdatetime.datetime.now()
 
     today_menu = DailyMenuItem.objects.filter(
-        expiration_date__date=currentDate.date()
+        expiration_date__date=currentDate.date(),
+        meal_type__in=request.user.profile.allowed_meal_type.all()
     )
 
     # Annotate each item with net reserved count for this user & this item & this date:
@@ -194,7 +195,8 @@ def get_meals_by_timestamp(request):
     date = dt.date()
 
     # fetch the day's menu
-    meals = DailyMenuItem.objects.filter(expiration_date__date=date)
+    meals = DailyMenuItem.objects.filter(expiration_date__date=date, meal_type__in=request.user.profile.allowed_meal_type.all())
+    print(request.user.profile.allowed_meal_type.all())
 
     # compute net reserved vs canceled for this user & date
     reservations = (
@@ -202,7 +204,7 @@ def get_meals_by_timestamp(request):
         .filter(
             user=request.user,
             dailymenu__in=meals,
-            dailymenu__expiration_date__date=date
+            dailymenu__expiration_date__date=date,
         )
         .values('dailymenu')
         .annotate(
@@ -235,6 +237,7 @@ def get_meals_by_timestamp(request):
             'id':             item.id,
             'name':           item.food.name,
             'description':    "، ".join(str(s) for s in item.side_dishes.all()),
+            'type':           item.meal_type.title,
             'price':          item.price,
             'image_url':      item.image_url,
             'max_qty':        max_q,

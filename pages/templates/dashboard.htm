@@ -23,6 +23,7 @@
                                 <hr>
                                 <div class="meal-detail">
                                     <span class="meal-name">{{ res.dailymenu.food.name }}</span>
+                                    <span class="meal-type">وعده: {{ res.dailymenu.meal_type.title }}</span>
                                     <span class="meal-description">
                       {{ res.dailymenu.side_dishes.all|join:"، " }}
                     </span>
