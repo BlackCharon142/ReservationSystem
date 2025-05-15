@@ -3,17 +3,18 @@ from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
 from django import forms
-from .models import Profile, RecoveryRequest
+from .models import Profile, RecoveryRequest, Guest
 
 admin.site.register(Profile)
+admin.site.register(Guest)
 
 class ProfileInlineForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('image','phone_number', 'wallet_balance',
-                  'security_answer_1','security_answer_2',
-                  'security_answer_3','security_answer_4',
-                  'security_answer_5')
+                  'allowed_meal_type','security_answer_1',
+                  'security_answer_2','security_answer_3',
+                  'security_answer_4','security_answer_5')
         labels = {
             'security_answer_1': 'نام بهترین دوست دوران کودکیتان چه بود؟',
             'security_answer_2': 'مدل یا برند اولین وسیله نقلیه تان چه بود؟',

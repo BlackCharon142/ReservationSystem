@@ -3,10 +3,24 @@ from django.utils import timezone
 from menu_items.models import Food, Drink, SideDish
 from django_jalali.db import models as jmodels
 
+class MealType(models.Model):
+    title = models.CharField(max_length=100)
+    MEAL_TYPE_CHOICES = [
+        ('breakfast', 'Breakfast'),
+        ('launch', 'Launch'),
+        ('dinner', 'Dinner'),
+        ('snack', 'Snack'),
+    ]
+    meal_type = models.CharField(max_length=10, unique=True, choices=MEAL_TYPE_CHOICES)
+
+    def __str__(self):
+        return f"{self.title} [{self.meal_type}]"
+
 class DailyMenuItem(models.Model):
     food = models.ForeignKey(Food, on_delete=models.CASCADE, related_name='daily_menus')
     drink = models.ForeignKey(Drink, on_delete=models.CASCADE, related_name='daily_menus')
     side_dishes = models.ManyToManyField(SideDish, related_name='daily_menus')  # Allows multiple selections
+    meal_type = models.ForeignKey(MealType, null=True, on_delete=models.SET_NULL)
 
     quantity = models.PositiveIntegerField(default=1)  # Quantity of the item
     max_purchasable_quantity = models.PositiveIntegerField(default=1)  # Max quantity allowed for purchase

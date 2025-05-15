@@ -13,53 +13,58 @@
     <div class="dashboard text">
         <div class="current-reserved-meals-list text">
             {% for res in today_reservations %}
-          <div class="meal">
-            <input type="checkbox" class="toggle-code" hidden>
-            <label class="meal-wrapper">
-              <div class="meal-image-code">
+                <div class="meal">
+                    <input type="checkbox" class="toggle-code" hidden>
+                    <label class="meal-wrapper">
+                        <div class="meal-image-code">
 
-                <div class="meal-image-container">
-                  <img src="{{ res.dailymenu.image_url }}" class="meal-image">
-                  <hr>
-                  <div class="meal-detail">
-                    <span class="meal-name">{{ res.dailymenu.food.name }}</span>
-                    <span class="meal-description">
+                            <div class="meal-image-container">
+                                <img src="{{ res.dailymenu.image_url }}" class="meal-image">
+                                <hr>
+                                <div class="meal-detail">
+                                    <span class="meal-name">{{ res.dailymenu.food.name }}</span>
+                                    <span class="meal-description">
                       {{ res.dailymenu.side_dishes.all|join:"، " }}
                     </span>
-                    <span class="meal-expiration" data-timestamp="{{ res.dailymenu.expiration_date.timestamp }}">
+                                    <span class="meal-expiration"
+                                          data-timestamp="{{ res.dailymenu.expiration_date.timestamp }}">
                       تاریخ انقضا:
                       <strong>{{ res.dailymenu.expiration_date|date:"Y/m/d" }}</strong>
                         |
                       <strong>{{ res.dailymenu.expiration_date|time:"H:i" }}</strong>
                     </span>
-                      <span class="meal-status {{ res.status.status }}">وضعیت: <strong>{{ res.status.title }}</strong></span>
-                  </div>
-                </div>
+                                    <span class="meal-status {{ res.status.status }}">وضعیت: <strong>{{ res.status.title }}</strong></span>
+                                </div>
+                            </div>
 
-                <div class="meal-code">
-                  <!-- inline the SVG -->
-                    {{ res.qr_svg|safe }}
-                  <hr>
-                  <div class="meal-code-number">
-                    کد غذا<br>{{ res.reservation_code }}
-                  </div>
-                </div>
+                            <div class="meal-code">
+                                <!-- inline the SVG -->
+                                {{ res.qr_svg|safe }}
+                                <hr>
+                                <div class="meal-code-number">
+                                    کد غذا<br>{{ res.reservation_code }}
+                                </div>
+                            </div>
 
-              </div>
-            </label>
-          </div>
-        {% empty %}
-          <p>شما رزروی ندارید.</p>
-        {% endfor %}
+                        </div>
+                    </label>
+                </div>
+            {% empty %}
+                <p>شما رزروی ندارید.</p>
+            {% endfor %}
         </div>
-    <div class="button-container">
-        <label id="toggle-all" class="receive-today-code">دریافت کد غذا</label>
-        <hr>
-        <button onclick="window.location.assign('{% url 'reserve' %}');" class="reserve-meal text">رزرو غذا</button>
-        <button onclick="window.location.assign('{% url 'reserved' %}');" class="reserved-meals text">وضعیت رزرو ها</button>
+        <div class="button-container">
+            {% if today_reservations %}
+                <label id="toggle-all" class="receive-today-code">دریافت کد غذا</label>
+            {% endif %}
+            <hr>
+            <button onclick="window.location.assign('{% url 'reserve' %}');" class="reserve-meal text">رزرو غذا</button>
+            <button onclick="window.location.assign('{% url 'reserved' %}');" class="reserved-meals text">وضعیت رزرو
+                ها
+            </button>
+        </div>
     </div>
-    </div>
-        <script>
+    <script>
         document.querySelectorAll('.meal').forEach((meal, i) => {
             const input = meal.querySelector('input.toggle-code');
             const label = meal.querySelector('label.meal-wrapper');
@@ -69,12 +74,12 @@
         });
 
         document.getElementById('toggle-all').addEventListener('click', () => {
-        const checkboxes = document.querySelectorAll('.meal input.toggle-code');
-        const allChecked = [...checkboxes].every(checkbox => checkbox.checked);
+            const checkboxes = document.querySelectorAll('.meal input.toggle-code');
+            const allChecked = [...checkboxes].every(checkbox => checkbox.checked);
 
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = !allChecked; // Toggle the state
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked; // Toggle the state
+            });
         });
-    });
     </script>
 {% endblock %}

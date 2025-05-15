@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.templatetags.static import static
 from PIL import Image
+from daily_menus.models import MealType
 import os
 
 class Profile(models.Model):
@@ -10,6 +11,7 @@ class Profile(models.Model):
     image = models.ImageField(upload_to='images/profiles/', blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     wallet_balance = models.DecimalField(max_digits=30, decimal_places=0, default=0)
+    allowed_meal_type = models.ManyToManyField(MealType, null=True)
     security_answer_1 = models.CharField(max_length=255, blank=True)
     security_answer_2 = models.CharField(max_length=255, blank=True)
     security_answer_3 = models.CharField(max_length=255, blank=True)
@@ -36,6 +38,14 @@ class Profile(models.Model):
                 img.thumbnail(output_size)
                 img.save(self.image.path)
 
+class Guest(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=254, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.firstname} {self.lastname} (ID: {self.guest_id})"
 
 class RecoveryRequest(models.Model):
     user = models.ForeignKey(

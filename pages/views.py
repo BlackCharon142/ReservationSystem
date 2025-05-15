@@ -236,7 +236,7 @@ def get_meals_by_timestamp(request):
             'name':           item.food.name,
             'description':    "، ".join(str(s) for s in item.side_dishes.all()),
             'price':          item.price,
-            'image_url':      item.image.url,
+            'image_url':      item.image_url,
             'max_qty':        max_q,
             'reserved_count': reserved_count,
         })
@@ -455,8 +455,6 @@ def reserved(request):
         buf = io.BytesIO()
         img.save(buf)
         res.qr_svg = buf.getvalue().decode('utf-8')
-
-    print(active_reservations)
 
     return render(request, "reserved.htm", {
         'reservations': active_reservations,
