@@ -92,7 +92,7 @@
     gap: 15px;
     min-width: 300px;
     max-width: 1300px;
-    min-height: 440px;
+    /*min-height: 440px;*/
 }
 
 .meal {
