@@ -1,0 +1,99 @@
+{% extends 'admin/admin.html' %}
+{% load static %}
+
+{% block extra_assets %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static '/style/fontawesome/css/all.min.css' %}" />
+{% endblock %}
+
+{% block title %}
+  {{ block.super }}
+  نوشیدنی ها
+{% endblock %}
+
+{% block admin_content %}
+  <div class="accordion">
+    <div class="accordion-item">
+      <div class="accordion-title text" id="search-accordion-toggle" onclick="toggleAccordion(this)">
+        <h3 class="widget-title">جستجو</h3>
+      </div>
+      <div class="accordion-content">
+        <div class="search-widget text">
+          <form class="search-form" method="get">
+            <div class="input-container search-container">
+              <label>جستجو :</label>
+              <input type="text" name="q" value="{{ request.GET.q }}" />
+            </div>
+            <div class="input-container submit-button-container">
+              <input type="submit" value="جستجو" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div id="drink-add-edit-form-accordion" class="accordion-title text" onclick="toggleAccordion(this)">
+        <h3 class="widget-title">افزودن و ویرایش نوشیدنی</h3>
+      </div>
+      <div class="accordion-content">
+        <div class="add-user-widget text">
+          <form id="drink-form" class="add-edit-form" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="drink-id" name="id" />
+            <div class="input-container drinkname-container">
+              <label>نام نوشیدنی :</label>
+              <input type="text" id="drink-name" name="name" />
+            </div>
+            <div class="input-container description-container">
+              <label>توضیحات:</label>
+              <input type="text" id="drink-description" name="description" />
+            </div>
+            <div class="input-container submit-button-container">
+              <input type="submit" value="ثبت" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr size="1" noshade />
+  <div class="reservation-log-widget">
+    <table class="reservation-logs text">
+      <tbody>
+        <tr>
+          <td>
+            <table class="reservation-log-header" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <th></th>
+                <th>نام نوشیدنی</th>
+                <th>توضیحات</th>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="reservation-log-list">
+              <table width="100%" cellspacing="0" cellpadding="0">
+                {% for drink in drinks %}
+                  <tr class="reservation-log-row" data-id="{{ drink.id }}">
+                    <td class="date-meal-actions">
+                      <i class="fas fa-edit edit-drink" data-id="{{ drink.id }}" data-name="{{ drink.name }}" data-description="{{ drink.description }}" onclick="toggleAccordion(document.getElementById('drink-add-edit-form-accordion'), true)"></i>
+                      &nbsp;&nbsp;&nbsp;
+                      <i class="fas fa-trash delete-drink" data-id="{{ drink.id }}"></i>
+                    </td>
+                    <td>{{ drink.name }}</td>
+                    <td class="date-meal-name">{{ drink.description }}</td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="{% static '/script/admin/admin-panel.js' %}"></script>
+  <script src="{% static '/script/admin/admin-drinks.js' %}"></script>
+{% endblock %}

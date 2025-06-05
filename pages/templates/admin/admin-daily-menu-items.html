@@ -1,0 +1,263 @@
+{% extends 'admin/admin.html' %}
+{% load static %}
+
+{% block extra_assets %}
+  {{ block.super }}
+  <script src="{% static '/script/jquery-3.7.0.min.js' %}"></script>
+  <script type="text/javascript" src="{% static '/plugins/material-persian-datetime-picker/src/jquery.mpdatetimepicker.js' %}"></script>
+  <link type="text/css" rel="stylesheet" href="{% static '/plugins/material-persian-datetime-picker/src/jquery.mpdatepicker.css' %}" />
+
+  <link rel="stylesheet" href="{% static '/style/fontawesome/css/all.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'style/reserved.css' %}" />
+{% endblock %}
+
+{% block title %}
+  {{ block.super }}
+  منوی روزانه
+{% endblock %}
+
+{% block admin_content %}
+  <div class="accordion">
+    <div class="accordion-item">
+      <div class="accordion-title text" onclick="toggleAccordion(this)">
+        <h3 class="widget-title">جستجو</h3>
+      </div>
+      <div class="accordion-content">
+        <div class="search-widget text">
+          <form class="search-form">
+            <div class="input-container search-container">
+              <label>جستجو :</label>
+              <input type="text" />
+            </div>
+            <div class="input-container submit-button-container">
+              <input type="submit" value="جستجو" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-title text" onclick="toggleAccordion(this)">
+        <h3 class="widget-title">افزودن و ویرایش منوی روزانه</h3>
+      </div>
+      <div class="accordion-content">
+        <div class="add-user-widget text">
+          <form class="add-edit-form">
+            <div class="input-container food-container">
+              <label>غذا :</label>
+              <select>
+                <option value="" disabled selected>Select food</option>
+                <option value="pizza">Pizza</option>
+                <option value="burger">Burger</option>
+                <option value="salad">Salad</option>
+                <option value="pasta">Pasta</option>
+              </select>
+            </div>
+            <div class="input-container drink-container">
+              <label>نوشیدنی :</label>
+              <select>
+                <option value="" disabled selected>Select food</option>
+                <option value="pizza">Pizza</option>
+                <option value="burger">Burger</option>
+                <option value="salad">Salad</option>
+                <option value="pasta">Pasta</option>
+              </select>
+            </div>
+            <div class="input-container sidedishes-container">
+              <label>مخلفات :</label>
+              <div class="checkbox-multiselect">
+                <label><input type="checkbox" name="food" value="pizza" />Pizza</label>
+                <label><input type="checkbox" name="food" value="burger" />Burger</label>
+                <label><input type="checkbox" name="food" value="salad" />Salad</label>
+                <label><input type="checkbox" name="food" value="pasta" />Pasta</label>
+                <label><input type="checkbox" name="food" value="sushi" />Sushi</label>
+                <label><input type="checkbox" name="food" value="taco" />Taco</label>
+                <label><input type="checkbox" name="food" value="noodles" />Noodles</label>
+                <label><input type="checkbox" name="food" value="steak" />Steak</label>
+                <label><input type="checkbox" name="food" value="curry" />Curry</label>
+                <label><input type="checkbox" name="food" value="sandwich" />Sandwich</label>
+                <label><input type="checkbox" name="food" value="soup" />Soup</label>
+                <label><input type="checkbox" name="food" value="rice" />Rice</label>
+              </div>
+            </div>
+            <div class="input-container meal-type-container">
+              <label>وعده :</label>
+              <select>
+                <option value="" disabled selected>Select food</option>
+                <option value="pizza">Pizza</option>
+                <option value="burger">Burger</option>
+                <option value="salad">Salad</option>
+                <option value="pasta">Pasta</option>
+              </select>
+            </div>
+            <div class="input-container quantity-container">
+              <label>موجودی:</label>
+              <input type="number" />
+            </div>
+            <div class="input-container max-purchasable-container">
+              <label>حداکثر میزان خرید هر کابر:</label>
+              <input type="number" />
+            </div>
+            <div class="input-container image-container">
+              <label>عکس:</label>
+              <input type="file" accept="image/*" />
+            </div>
+            <div class="input-container reservation-deadline-container">
+              <label>تاریخ پایان مهلت رزرو:</label>
+              <div class="date-selection">
+                <div class="date-picker-wrapper">
+                  <input type="text" placeholder="تاریخ مورد نظر را انتخاب کنید" class="date-picker text" value="" />
+                  <button type="button" class="clear-date" aria-label="پاک کردن تاریخ">&times;</button>
+                </div>
+              </div>
+            </div>
+            <div class="input-container expiration-date-container">
+              <label>تاریخ پایان مهلت استفاده:</label>
+              <div class="date-selection">
+                <div class="date-picker-wrapper">
+                  <input type="text" placeholder="تاریخ مورد نظر را انتخاب کنید" class="date-picker text" value="" />
+                  <button type="button" class="clear-date" aria-label="پاک کردن تاریخ">&times;</button>
+                </div>
+              </div>
+            </div>
+            <div class="input-container price-container">
+              <label>قیمت:</label>
+              <input type="number" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr size="1" noshade />
+  <div class="reservation-log-widget">
+    <table class="reservation-logs text">
+      <tbody>
+        <tr>
+          <td>
+            <table class="reservation-log-header" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <th></th>
+                <th>تاریخ انقضا</th>
+                <th>غذا، نوشیدنی و مخلفات</th>
+                <th>وعده</th>
+                <th>موجودی</th>
+                <th>قیمت</th>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="reservation-log-list">
+              <table width="100%" cellspacing="0" cellpadding="0">
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+                <tr class="reservation-log-row" data-meal-id>
+                  <td class="date-meal-actions">
+                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
+                  </td>
+                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
+                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
+                  <td class="date-meal-description">صبحانه</td>
+                  <td class="date-meal-price">5</td>
+                  <td>50000 تومان</td>
+                </tr>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="{% static '/script/admin/admin-panel.js' %}"></script>
+
+  <script type="text/javascript">
+    $(function () {
+      $('.date-picker').mpdatepicker({
+        timePicker: true,
+        onOpen: function () {
+          console.log('open')
+        },
+        onSelect: function (selected) {
+          console.log('select', selected)
+        },
+        onChange: function (oldVal, newVal) {
+          console.log('change', oldVal, newVal)
+        },
+        onClose: function () {
+          console.log('close')
+        }
+      })
+    })
+  </script>
+{% endblock %}

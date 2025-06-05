@@ -61,3 +61,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // initial run
     filterMeals();
 });
+
+document.querySelectorAll('.meal').forEach((meal, i) => {
+    const input = meal.querySelector('input.toggle-code');
+    const label = meal.querySelector('label.meal-wrapper');
+    const id = `toggle-code-${i}`;
+    input.id = id;
+    label.setAttribute('for', id);
+});

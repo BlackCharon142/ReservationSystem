@@ -1,0 +1,122 @@
+{% extends 'admin/admin.html' %}
+{% load static %}
+
+{% block extra_assets %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static '/style/fontawesome/css/all.min.css' %}" />
+{% endblock %}
+
+{% block title %}
+  {{ block.super }}
+  غذا ها
+{% endblock %}
+
+{% block admin_content %}
+  <div class="accordion">
+    <div class="accordion-item">
+      <div class="accordion-title text" id="search-accordion-toggle" onclick="toggleAccordion(this)">
+        <h3 class="widget-title">جستجو</h3>
+      </div>
+      <div class="accordion-content">
+        <div class="search-widget text">
+          <form class="search-form" method="get">
+            <div class="input-container search-container">
+              <label>جستجو :</label>
+              <input type="text" name="q" value="{{ request.GET.q }}" />
+            </div>
+            <div class="input-container submit-button-container">
+              <input type="submit" value="جستجو" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div id="food-add-edit-form-accordion" class="accordion-title text" onclick="toggleAccordion(this)">
+        <h3 class="widget-title">افزودن و ویرایش غذا</h3>
+      </div>
+      <div class="accordion-content">
+        <div class="add-user-widget text">
+          <form class="add-edit-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="food-id" />
+
+            <div class="input-container foodname-container">
+              <label>نام غذا :</label>
+              <input type="text" name="name" id="food-name" />
+            </div>
+
+            <div class="input-container foodimage-container">
+              <label>تصویر غذا:</label>
+              <span>
+              <input type="file" name="image" id="food-image" accept="image/*" />
+              <img id="current-image" src="" />
+              </span>
+            </div>
+
+            <div class="input-container description-container">
+              <label>توضیحات:</label>
+              <input type="text" name="description" id="food-description" />
+            </div>
+
+            <div class="input-container submit-button-container">
+              <input type="submit" value="ثبت" />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr size="1" noshade />
+  <div class="reservation-log-widget">
+    <table class="reservation-logs text">
+      <tbody>
+        <tr>
+          <td>
+            <table class="reservation-log-header" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <th></th>
+                <th>نام غذا</th>
+                <th>توضیحات</th>
+                <th>تصویر</th>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="reservation-log-list">
+              <table width="100%" cellspacing="0" cellpadding="0">
+                {% for food in foods %}
+                  <tr class="reservation-log-row"
+                      data-id="{{ food.id }}" 
+                      data-name="{{ food.name }}"
+                      data-description="{{ food.description }}"
+                      {% if food.image %}
+                          data-image-url="{{ food.image.url }}"
+                      {% else %}
+                          data-image-url=""
+                      {% endif %}
+                      onclick="toggleAccordion(document.getElementById('food-add-edit-form-accordion'), true);">
+                    <td class="date-meal-actions">
+                      <i class="fas fa-edit edit-food"></i> &nbsp;&nbsp;&nbsp;
+                      <i class="fas fa-trash delete-food"></i>
+                    </td>
+                    <td>{{ food.name }}</td>
+                    <td>{{ food.description }}</td>
+                    <td>
+                    <td><img src="{{ food.image_url }}"/></td>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="{% static '/script/admin/admin-panel.js' %}"></script>
+  <script src="{% static '/script/admin/admin-foods.js' %}"></script>
+{% endblock %}

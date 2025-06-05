@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block extra_assets %}
+    {{ block.super }}
+    <script src="{% static "script/jquery-3.7.0.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "plugins/material-persian-datetime-picker/src/jquery.mpdatepicker.js" %}"></script>
+    <link type="text/css" rel="stylesheet"
+        href="{% static "plugins/material-persian-datetime-picker/src/jquery.mpdatepicker.css" %}" />
+
+    <link rel="stylesheet" href="{% static "style/reserve.css" %}">
+{% endblock %}
+
+{% block title %}رزرو غذا{% endblock %}
+
+{% block content %}
+    <div class="reserve-form">
+        <div class="date-selection">
+            <input type="text" id="myDate" placeholder="تاریخ مورد نظر را انتخاب کنید" class="date-picker text" value="" />
+        </div>
+        <table class="date-meal-menu text">
+            <thead class="date-meal-header">
+                <tr>
+                    <th></th>
+                    <th>غذا</th>
+                    <th>توضیحات</th>
+                    <th>وعده</th>
+                    <th>قیمت</th>
+                    <th>تعداد</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in todayMenu %}
+              <tr class="date-meal-row" data-meal-id="{{ item.id }}">
+                <td><img src="{{ item.image_url }}"></td>
+                <td class="date-meal-name">{{ item.food.name }}</td>
+                <td class="date-meal-description">{{ item.side_dishes.all|join:"، " }}</td>
+                <td class="date-meal-type">{{ item.meal_type.title }}</td>
+                <td class="date-meal-price">{{ item.price|intcomma }}<span> تومان</span></td>
+                <td>
+                  {% if item.max_purchasable_quantity > 0 %}
+                    <div
+                      class="counter"
+                      data-min="0"
+                      data-max="{{ item.max_purchasable_quantity }}"
+                      data-current="{{ item.reserved_count }}"
+                    >
+                      <button class="decrement">-</button>
+                      <div class="number">{{ item.reserved_count }}</div>
+                      <button class="increment">+</button>
+                    </div>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button onclick="window.location.assign('{% url 'dashboard' %}');" class="previous-page text">برگشت</button>
+    </div>
+
+    <script src="{% static "script/reserve.js" %}"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $(".date-picker").mpdatepicker({
+                'timePicker': true,
+                onOpen: function () {
+                    console.log('open');
+                },
+                onSelect: function (selected) {
+                    console.log('select',selected);
+                },
+                onChange: function (oldVal, newVal) {
+                    console.log('change',oldVal,newVal)
+                    const timestamp = newVal;
+                    if (timestamp && timestamp !== "null") {
+                        fetchMealsForDate(timestamp);
+                    }
+                },
+                onClose: function () {
+                    console.log('close');
+                },
+            });
+        });
+
+        $(function(){
+            const ts    = {{ currentDate }};
+            const pDate = $.mpdt.pTimestamp2Date(ts);
+            $('#myDate')
+                .val(pDate)
+                .attr('data-timestamp', ts)
+                .trigger('change');
+        });
+    </script>
+{% endblock %}

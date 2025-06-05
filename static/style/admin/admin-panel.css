@@ -1,0 +1,520 @@
+.container {
+    display: flex;
+    width: 85%;
+    min-width: 850px;
+    max-width: 1300px;
+    min-height: 720px;
+    max-height: fit-content;
+    margin: 50px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+
+    overflow: auto;
+    /* Use a container for scrollable content */
+    flex: 1;
+    /* Allow the container to grow */
+}
+
+.sidebar {
+    max-width: 250px;
+    width: 25%;
+    padding: 40px 0;
+    border-left: 1px solid #eaeaea;
+}
+
+.admin-short-detail {
+    padding: 0 15px 15px 15px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.admin-profile-thumb {
+    height: 50px;
+    width: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 100%;
+}
+
+.admin-name-welcome-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.admin-name-welcome-container .admin-name {
+    font-size: 18px;
+}
+
+.admin-name-welcome-container .welcome-message {
+    font-size: 14px;
+}
+
+.menu-item {
+    font-family: 'Vazirmatn';
+    margin-bottom: 20px;
+}
+
+.menu-item h3 {
+    text-shadow: 0 0 3px #f9f9f9;
+    color: #FFA500;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 7px;
+    margin-top: 30px;
+}
+
+.menu-item button:last-child {
+    border-bottom: 1px solid #eaeaea;
+}
+
+h1,
+h2,
+h3 {
+    color: #333;
+}
+
+.menu-item button {
+    width: 100%;
+    font-family: 'Vazirmatn';
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.3em;
+    text-align: right;
+    background-color: transparent;
+    color: #111;
+    border: none;
+    border-top: 1px solid #eaeaea;
+    border-radius: 0;
+    padding: 12px 13px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.menu-item button:hover {
+    color: #fff;
+    background-color: #111;
+    border-color: #111;
+}
+
+.menu-item button.active {
+    color: #fff;
+    background-color: #FFA500;
+    border-color: #FFA500;
+}
+
+.main-section {
+    width: 75%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.guest-codes-widget,
+.reservation-log-widget {
+    flex: 1;
+    color: #111;
+}
+
+.widget-title {
+    font-family: 'Vazirmatn';
+    font-size: 16px;
+    margin: 0 15px 3px 15px;
+}
+
+.main-section hr {
+    width: 100%;
+    border: 0.5px solid #eaeaea;
+    margin: 0 0 20px 0;
+}
+
+.main-section .current-reserved-meals-list {
+    min-height: 300px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 15px;
+}
+
+.main-section .meal-image-code,
+.main-section .meal {
+    width: 200px;
+    height: 300px;
+}
+
+.main-section .meal-image {
+    width: 50%;
+    height: auto;
+    filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.4));
+}
+
+.main-section .meal-name,
+.main-section .meal-code-number {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.main-section .meal-description,
+.main-section .meal-expiration,
+.meal-guest {
+    font-size: 12px;
+}
+
+.accordion {
+    width: 100%;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.accordion-item {
+    border-bottom: 1px solid #ddd;
+}
+
+.accordion-title {
+    padding: 15px;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    transition: background-color 0.3s ease;
+}
+
+.accordion-title:hover {
+    background-color: #e2e2e2;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    padding: 0 15px;
+    background-color: white;
+}
+
+
+/*reservation*/
+
+.reservation-logs {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 15px;
+}
+
+.reservation-logs td {
+    padding: 0;
+}
+
+.reservation-log-header {
+    position: relative;
+    background-color: #D9D9D9;
+    /* Light background for header */
+    font-weight: bold;
+    padding-left: 6px;
+}
+
+.reservation-log-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid #000;
+    /* Change color and size as needed */
+    border-radius: 10px 10px 0 0;
+    pointer-events: none;
+    /* Allows clicks to pass through */
+}
+
+.reservation-log-header tr th {
+    text-align: center;
+    /* Center text */
+    padding: 15px 0;
+    font-size: 14px;
+}
+
+.reservation-log-header tr th:nth-child(1),
+.reservation-log-row td:nth-child(1) {
+    width: 5%;
+}
+
+.reservation-log-header tr th:nth-child(2),
+.reservation-log-row td:nth-child(2) {
+    width: 15%;
+}
+
+.reservation-log-header tr th:nth-child(3),
+.reservation-log-row td:nth-child(3) {
+    width: 30%;
+}
+
+.reservation-log-header tr th:nth-child(4),
+.reservation-log-row td:nth-child(4) {
+    width: 10%;
+}
+
+.reservation-log-header tr th:nth-child(5),
+.reservation-log-row td:nth-child(5) {
+    width: 10%;
+}
+
+.reservation-log-header tr th:nth-child(6),
+.reservation-log-row td:nth-child(6) {
+    width: 10%;
+}
+
+.reservation-log-header tr th:nth-child(7),
+.reservation-log-row td:nth-child(7) {
+    width: 25%;
+}
+
+.reservation-log-list {
+    min-height: 20px;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.date-meal-actions i {
+    color: #FFA500;
+}
+
+.date-meal-actions i:hover {
+    color: #fcb635;
+    cursor: pointer;
+}
+
+.date-meal-actions i:active {
+    color: #fcb635;
+}
+
+tr.reservation-log-row td {
+    text-align: center;
+    font-size: 14px;
+}
+
+tr.reservation-log-row td img {
+    width: 50%;
+    max-width: 50px;
+    height: auto;
+    border-radius: 3px;
+}
+
+.reservation-log-row {
+    border-bottom: 1px solid #ccc;
+    /* Separator line between meals */
+    padding: 10px;
+    height: 60px;
+}
+
+.reservation-log-row:last-child {
+    border-bottom: 0;
+}
+
+/*Add Search Form*/
+
+.add-edit-form,
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    /* space between boxes */
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.input-container {
+    padding: 5px 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 300px;
+    /* flexible width, minimum 300px */
+    max-width: 400px;
+}
+
+.input-container span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.input-container label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.input-container input[type="text"],
+.input-container input[type="email"],
+.input-container input[type="tel"],
+.input-container input[type="number"],
+.input-container input[type="file"] {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    font-family: "VazirmatnFD";
+    outline-color: #FFA500;
+    transition: border-color 0.3s ease;
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.input-container input[type="text"]:focus,
+.input-container input[type="email"]:focus,
+.input-container input[type="tel"]:focus,
+.input-container input[type="number"]:focus,
+.input-container input[type="file"]:focus {
+    border-color: #FFA500;
+}
+
+.input-container img {
+    max-height: 45px;
+    width: auto;
+    display: none;
+    border-radius: 4px;
+}
+
+.input-container input[type="radio" i] {
+    margin-bottom: 10px;
+}
+
+.input-container .date-picker-wrapper {
+    display: flex;
+}
+
+.input-container .date-picker-wrapper input[type="text"] {
+    flex: 1;
+}
+
+.input-container input[type="submit"] {
+    border: 0;
+    background-color: #FFA500;
+    color: #111;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    transition: all 0.2s;
+    font-size: 16px;
+    font-family: "VazirmatnFD", "Vazirmatn", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.input-container input[type="submit"]:hover {
+    background-color: #111;
+    color: #FFA500;
+    cursor: pointer;
+}
+
+.input-container input[type="submit"]:active {
+    background-color: #111;
+    color: #fff;
+}
+
+.input-container select {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    outline-color: #FFA500;
+    transition: border-color 0.3s ease;
+    appearance: none;
+    background-color: #fff;
+    color: #333;
+}
+
+.input-container select:focus {
+    border-color: #FFA500;
+}
+
+.checkbox-multiselect {
+    max-height: 100px;
+    /* makes it scrollable */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 5px 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    font-size: 15px;
+    background-color: #fff;
+}
+
+.checkbox-multiselect input[type="checkbox"] {
+    accent-color: #FFA500;
+    cursor: pointer;
+    margin-right: 2px;
+}
+
+.checkbox-multiselect label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 3px;
+    color: #333;
+    font-weight: 400;
+}
+
+.checkbox-multiselect:focus-within {
+    border-color: #FFA500;
+}
+
+.submit-button-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+
+.allowed-meals-container {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.allowed-meals-container input[type="checkbox"] {
+    accent-color: #FFA500;
+    cursor: pointer;
+}
+
+.allowed-meals-container span {
+    margin-right: 11px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .add-edit-form {
+        flex-direction: column;
+        padding: 12px;
+    }
+
+    .input-container {
+        max-width: 100%;
+        flex: 1 1 auto;
+    }
+
+    .allowed-meals-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .allowed-meals-container input[type="checkbox"] {
+        margin-left: 0;
+        margin-right: 6px;
+    }
+
+    .allowed-meals-container span {
+        margin-right: 10px;
+        margin-bottom: 8px;
+    }
+}

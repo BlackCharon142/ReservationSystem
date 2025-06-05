@@ -59,6 +59,11 @@
     color: inherit;            /* Highlighted text color */
 }
 
+input::selection {
+    background-color: #111111;
+    color:#F6F7FB;
+}
+
 html, body {
     height: 100%; /* Set html and body to 100% height */
     margin: 0;    /* Remove default margin */

@@ -45,7 +45,7 @@ class Guest(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.firstname} {self.lastname} (ID: {self.guest_id})"
+        return f"{self.first_name} {self.last_name} (ID: {self.id})"
 
 class RecoveryRequest(models.Model):
     user = models.ForeignKey(
