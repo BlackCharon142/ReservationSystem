@@ -40,4 +40,5 @@ urlpatterns = [
     
     path('admin/guests', views.admin_guests, name='admin_guests'),
     path('admin/guests/delete/<int:id>/', views.delete_guest, name='delete_guests'),
+    path('admin/guests/cancel-reservation/', views.cancel_reservation, name='cancel_guest_reservation'),
 ]

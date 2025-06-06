@@ -2,314 +2,53 @@
 {% load static %}
 
 {% block extra_assets %}
-{{ block.super}}
-    <link rel="stylesheet" href="{% static "style/reserved.css" %}">
-{% endblock extra_assets %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'style/reserved.css' %}" />
+{% endblock %}
 
-{% block title %}{{ block.super }}داشبورد{% endblock %}
+{% block title %}
+  {{ block.super }}داشبورد
+{% endblock %}
 
 {% block admin_content %}
   <div class="guest-codes-widget">
     <h3 class="widget-title">رزرو میهمان</h3>
     <div class="current-reserved-meals-list text">
-      <div class="meal">
-        <input type="checkbox" class="toggle-code" hidden />
-        <label class="meal-wrapper">
-          <div class="meal-image-code">
-            <div class="meal-image-container">
-              <img src="/images/Gheimeh.png" class="meal-image" />
-              <hr />
-              <div class="meal-detail">
-                <span class="meal-name">قرمه سبزی</span>
-                <span class="meal-description">همراه با نوشیدنی و سالاد</span>
-                <span class="meal-expiration" data-timestamp="1746468720">
-                  قابل استفاده در تاریخ
-                  <strong>۱۴۰۴/۰۲/۱۵</strong><br />
-                  تا ساعت <strong>۱۸:۰۰</strong>
-                </span>
-                <span class="meal-guest">میهمان: <b>علی حیدری</b></span>
+      {% for res in guests_reservations %}
+        <div class="meal">
+          <input type="checkbox" class="toggle-code" hidden />
+          <label class="meal-wrapper">
+            <div class="meal-image-code">
+              <div class="meal-image-container">
+                <img src="{{ res.dailymenu.image_url }}" class="meal-image" />
+                <hr />
+                <div class="meal-detail">
+                  <span class="meal-name">{{ res.dailymenu.food.name }}</span>
+                  <span class="meal-description">
+                    {% if res.dailymenu.drink %}{{ res.dailymenu.drink.name }}{% endif %}
+                    {% for side in res.dailymenu.side_dishes.all %}
+                      ، {{ side.name }}
+                    {% endfor %}
+                  </span>
+                  <span class="meal-expiration">
+                    قابل استفاده در تاریخ
+                    <strong>{{ res.dailymenu.expiration_date|date:'Y/m/d' }}</strong><br />
+                    تا ساعت <strong>{{ res.dailymenu.expiration_date|date:'H:i' }}</strong>
+                  </span>
+                  <span class="meal-guest">میهمان: <b>{{ res.guest.first_name }} {{ res.guest.last_name }}</b></span>
+                </div>
+              </div>
+              <div class="meal-code">
+                {{ res.qr_svg|safe }}
+                <hr />
+                <div class="meal-code-number">
+                  کد غذا<br />{{ res.reservation_code }}
+                </div>
               </div>
             </div>
-            <div class="meal-code">
-              <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 600 600">
-                <path d="M264 72h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M240 96h25v25h-25z" />
-                <path d="M264 96h25v25h-25z" />
-                <path d="M288 96h25v25h-25z" />
-                <path d="M312 96h25v25h-25z" />
-                <path d="M336 96h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M264 120h25v25h-25z" />
-                <path d="M240 144h25v25h-25z" />
-                <path d="M264 144h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 144h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M336 168h25v25h-25zm-96 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 192h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M312 216h25v25h-25z" />
-                <path d="M336 216h25v25h-25zM48 240h25v25H48zm48 0h25v25H96z" />
-                <path d="M120 240h25v25h-25z" />
-                <path d="M144 240h25v25h-25z" />
-                <path d="M168 240h25v25h-25z" />
-                <path d="M192 240h25v25h-25zm72 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M408 240h25v25h-25z" />
-                <path d="M432 240h25v25h-25z" />
-                <path d="M456 240h25v25h-25z" />
-                <path d="M480 240h25v25h-25zM48 264h25v25H48zm72 0h25v25h-25zm96 0h25v25h-25z" />
-                <path d="M240 264h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M480 264h25v25h-25z" />
-                <path d="M504 264h25v25h-25z" />
-                <path d="M528 264h25v25h-25zM48 288h25v25H48zm72 0h25v25h-25z" />
-                <path d="M144 288h25v25h-25z" />
-                <path d="M168 288h25v25h-25z" />
-                <path d="M192 288h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M264 288h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M456 288h25v25h-25zm72 0h25v25h-25zM48 312h25v25H48z" />
-                <path d="M72 312h25v25H72z" />
-                <path d="M96 312h25v25H96zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M240 312h25v25h-25z" />
-                <path d="M264 312h25v25h-25zm144 0h25v25h-25z" />
-                <path d="M432 312h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M504 312h25v25h-25z" />
-                <path d="M528 312h25v25h-25zM48 336h25v25H48zm96 0h25v25h-25zm48 0h25v25h-25zm120 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M504 336h25v25h-25zm-264 24h25v25h-25z" />
-                <path d="M264 360h25v25h-25z" />
-                <path d="M288 360h25v25h-25z" />
-                <path d="M312 360h25v25h-25z" />
-                <path d="M336 360h25v25h-25z" />
-                <path d="M360 360h25v25h-25z" />
-                <path d="M384 360h25v25h-25zm96 0h25v25h-25zm-216 24h25v25h-25z" />
-                <path d="M288 384h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M408 384h25v25h-25zm-168 24h25v25h-25z" />
-                <path d="M264 408h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 408h25v25h-25z" />
-                <path d="M360 408h25v25h-25z" />
-                <path d="M384 408h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M480 408h25v25h-25zm48 0h25v25h-25zm-288 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M456 432h25v25h-25zm-216 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M480 456h25v25h-25zm-240 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M312 480h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zm-216 24h25v25h-25z" />
-                <path d="M288 504h25v25h-25zm120 0h25v25h-25z" />
-                <path d="M432 504h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M504 504h25v25h-25zm-264 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M312 528h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zM48 48v168h168V48H48zm144 144H72V72h120v120zM384 48v168h168V48H384zm144 144H408V72h120v120zM48 384v168h168V384H48zm144 144H72V408h120v120z" />
-                <path d="M96 96h72v72H96zm336 0h72v72h-72zM96 432h72v72H96z" />
-              </svg>
-              <hr />
-              <div class="meal-code-number">
-                کد غذا<br />۱۲۳۴۵۶۷۸
-              </div>
-            </div>
-          </div>
-        </label>
-      </div>
-
-      <div class="meal">
-        <input type="checkbox" class="toggle-code" hidden />
-        <label class="meal-wrapper">
-          <div class="meal-image-code">
-            <div class="meal-image-container">
-              <img src="/images/Gheimeh.png" class="meal-image" />
-              <hr />
-              <div class="meal-detail">
-                <span class="meal-name">قرمه سبزی</span>
-                <span class="meal-description">همراه با نوشیدنی و سالاد</span>
-                <span class="meal-expiration" data-timestamp="1746468720">
-                  قابل استفاده در تاریخ
-                  <strong>۱۴۰۴/۰۲/۱۵</strong><br />
-                  تا ساعت <strong>۱۸:۰۰</strong>
-                </span>
-                <span class="meal-guest">میهمان: <b>علی حیدری</b></span>
-              </div>
-            </div>
-            <div class="meal-code">
-              <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 600 600">
-                <path d="M264 72h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M240 96h25v25h-25z" />
-                <path d="M264 96h25v25h-25z" />
-                <path d="M288 96h25v25h-25z" />
-                <path d="M312 96h25v25h-25z" />
-                <path d="M336 96h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M264 120h25v25h-25z" />
-                <path d="M240 144h25v25h-25z" />
-                <path d="M264 144h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 144h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M336 168h25v25h-25zm-96 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 192h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M312 216h25v25h-25z" />
-                <path d="M336 216h25v25h-25zM48 240h25v25H48zm48 0h25v25H96z" />
-                <path d="M120 240h25v25h-25z" />
-                <path d="M144 240h25v25h-25z" />
-                <path d="M168 240h25v25h-25z" />
-                <path d="M192 240h25v25h-25zm72 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M408 240h25v25h-25z" />
-                <path d="M432 240h25v25h-25z" />
-                <path d="M456 240h25v25h-25z" />
-                <path d="M480 240h25v25h-25zM48 264h25v25H48zm72 0h25v25h-25zm96 0h25v25h-25z" />
-                <path d="M240 264h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M480 264h25v25h-25z" />
-                <path d="M504 264h25v25h-25z" />
-                <path d="M528 264h25v25h-25zM48 288h25v25H48zm72 0h25v25h-25z" />
-                <path d="M144 288h25v25h-25z" />
-                <path d="M168 288h25v25h-25z" />
-                <path d="M192 288h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M264 288h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M456 288h25v25h-25zm72 0h25v25h-25zM48 312h25v25H48z" />
-                <path d="M72 312h25v25H72z" />
-                <path d="M96 312h25v25H96zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M240 312h25v25h-25z" />
-                <path d="M264 312h25v25h-25zm144 0h25v25h-25z" />
-                <path d="M432 312h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M504 312h25v25h-25z" />
-                <path d="M528 312h25v25h-25zM48 336h25v25H48zm96 0h25v25h-25zm48 0h25v25h-25zm120 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M504 336h25v25h-25zm-264 24h25v25h-25z" />
-                <path d="M264 360h25v25h-25z" />
-                <path d="M288 360h25v25h-25z" />
-                <path d="M312 360h25v25h-25z" />
-                <path d="M336 360h25v25h-25z" />
-                <path d="M360 360h25v25h-25z" />
-                <path d="M384 360h25v25h-25zm96 0h25v25h-25zm-216 24h25v25h-25z" />
-                <path d="M288 384h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M408 384h25v25h-25zm-168 24h25v25h-25z" />
-                <path d="M264 408h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 408h25v25h-25z" />
-                <path d="M360 408h25v25h-25z" />
-                <path d="M384 408h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M480 408h25v25h-25zm48 0h25v25h-25zm-288 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M456 432h25v25h-25zm-216 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M480 456h25v25h-25zm-240 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M312 480h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zm-216 24h25v25h-25z" />
-                <path d="M288 504h25v25h-25zm120 0h25v25h-25z" />
-                <path d="M432 504h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M504 504h25v25h-25zm-264 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M312 528h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zM48 48v168h168V48H48zm144 144H72V72h120v120zM384 48v168h168V48H384zm144 144H408V72h120v120zM48 384v168h168V384H48zm144 144H72V408h120v120z" />
-                <path d="M96 96h72v72H96zm336 0h72v72h-72zM96 432h72v72H96z" />
-              </svg>
-              <hr />
-              <div class="meal-code-number">
-                کد غذا<br />۱۲۳۴۵۶۷۹
-              </div>
-            </div>
-          </div>
-        </label>
-      </div>
-
-      <div class="meal">
-        <input type="checkbox" class="toggle-code" hidden />
-        <label class="meal-wrapper">
-          <div class="meal-image-code">
-            <div class="meal-image-container">
-              <img src="/images/Gheimeh.png" class="meal-image" />
-              <hr />
-              <div class="meal-detail">
-                <span class="meal-name">قرمه سبزی</span>
-                <span class="meal-description">همراه با نوشیدنی و سالاد</span>
-                <span class="meal-expiration" data-timestamp="1747159920">
-                  قابل استفاده در تاریخ
-                  <strong>۱۴۰۴/۰۲/۲۳</strong><br />
-                  تا ساعت <strong>۱۸:۰۰</strong>
-                </span>
-                <span class="meal-guest">میهمان: <b>علی حیدری</b></span>
-              </div>
-            </div>
-            <div class="meal-code">
-              <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 600 600"></svg>
-              <hr />
-              <div class="meal-code-number">
-                کد غذا<br />۱۲۳۴۵۶۷۹
-              </div>
-            </div>
-          </div>
-        </label>
-      </div>
-
-      <div class="meal">
-        <input type="checkbox" class="toggle-code" hidden />
-        <label class="meal-wrapper">
-          <div class="meal-image-code">
-            <div class="meal-image-container">
-              <img src="/images/Gheimeh.png" class="meal-image" />
-              <hr />
-              <div class="meal-detail">
-                <span class="meal-name">قرمه سبزی</span>
-                <span class="meal-description">همراه با نوشیدنی و سالاد</span>
-                <span class="meal-expiration" data-timestamp="1746209520">
-                  قابل استفاده در تاریخ
-                  <strong>۱۴۰۴/۰۲/۱۲</strong><br />
-                  تا ساعت <strong>۱۸:۰۰</strong>
-                </span>
-                <span class="meal-guest">میهمان: <b>علی حیدری</b></span>
-              </div>
-            </div>
-            <div class="meal-code">
-              <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 600 600">
-                <path d="M264 72h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M240 96h25v25h-25z" />
-                <path d="M264 96h25v25h-25z" />
-                <path d="M288 96h25v25h-25z" />
-                <path d="M312 96h25v25h-25z" />
-                <path d="M336 96h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M264 120h25v25h-25z" />
-                <path d="M240 144h25v25h-25z" />
-                <path d="M264 144h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 144h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M336 168h25v25h-25zm-96 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 192h25v25h-25zm-96 24h25v25h-25z" />
-                <path d="M312 216h25v25h-25z" />
-                <path d="M336 216h25v25h-25zM48 240h25v25H48zm48 0h25v25H96z" />
-                <path d="M120 240h25v25h-25z" />
-                <path d="M144 240h25v25h-25z" />
-                <path d="M168 240h25v25h-25z" />
-                <path d="M192 240h25v25h-25zm72 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M408 240h25v25h-25z" />
-                <path d="M432 240h25v25h-25z" />
-                <path d="M456 240h25v25h-25z" />
-                <path d="M480 240h25v25h-25zM48 264h25v25H48zm72 0h25v25h-25zm96 0h25v25h-25z" />
-                <path d="M240 264h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M480 264h25v25h-25z" />
-                <path d="M504 264h25v25h-25z" />
-                <path d="M528 264h25v25h-25zM48 288h25v25H48zm72 0h25v25h-25z" />
-                <path d="M144 288h25v25h-25z" />
-                <path d="M168 288h25v25h-25z" />
-                <path d="M192 288h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M264 288h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M456 288h25v25h-25zm72 0h25v25h-25zM48 312h25v25H48z" />
-                <path d="M72 312h25v25H72z" />
-                <path d="M96 312h25v25H96zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M240 312h25v25h-25z" />
-                <path d="M264 312h25v25h-25zm144 0h25v25h-25z" />
-                <path d="M432 312h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M504 312h25v25h-25z" />
-                <path d="M528 312h25v25h-25zM48 336h25v25H48zm96 0h25v25h-25zm48 0h25v25h-25zm120 0h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M504 336h25v25h-25zm-264 24h25v25h-25z" />
-                <path d="M264 360h25v25h-25z" />
-                <path d="M288 360h25v25h-25z" />
-                <path d="M312 360h25v25h-25z" />
-                <path d="M336 360h25v25h-25z" />
-                <path d="M360 360h25v25h-25z" />
-                <path d="M384 360h25v25h-25zm96 0h25v25h-25zm-216 24h25v25h-25z" />
-                <path d="M288 384h25v25h-25zm48 0h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M408 384h25v25h-25zm-168 24h25v25h-25z" />
-                <path d="M264 408h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M336 408h25v25h-25z" />
-                <path d="M360 408h25v25h-25z" />
-                <path d="M384 408h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M480 408h25v25h-25zm48 0h25v25h-25zm-288 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M456 432h25v25h-25zm-216 24h25v25h-25zm96 0h25v25h-25zm72 0h25v25h-25z" />
-                <path d="M480 456h25v25h-25zm-240 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M312 480h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zm-216 24h25v25h-25z" />
-                <path d="M288 504h25v25h-25zm120 0h25v25h-25z" />
-                <path d="M432 504h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M504 504h25v25h-25zm-264 24h25v25h-25zm48 0h25v25h-25z" />
-                <path d="M312 528h25v25h-25zm48 0h25v25h-25zm72 0h25v25h-25zm48 0h25v25h-25zM48 48v168h168V48H48zm144 144H72V72h120v120zM384 48v168h168V48H384zm144 144H408V72h120v120zM48 384v168h168V384H48zm144 144H72V408h120v120z" />
-                <path d="M96 96h72v72H96zm336 0h72v72h-72zM96 432h72v72H96z" />
-              </svg>
-              <hr />
-              <div class="meal-code-number">
-                کد غذا<br />۱۲۳۴۵۶۷۹
-              </div>
-            </div>
-          </div>
-        </label>
-      </div>
+          </label>
+        </div>
+      {% endfor %}
     </div>
   </div>
   <hr size="1" noshade />
@@ -335,70 +74,32 @@
           <td>
             <div class="reservation-log-list">
               <table width="100%" cellspacing="0" cellpadding="0">
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td></td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
+                {% for r in reservations %}
+                  <tr class="reservation-log-row">
+                    <td></td>
+                    
+                    {% if r.guest %}
+                    <td>{{ r.guest.first_name|default:'-' }} {{ r.guest.last_name|default:'-' }}</td>
+                    {% else %}
+                    <td>{{ r.user.first_name|default:'-' }} {{ r.user.last_name|default:'-' }}</td>
+                    {% endif %}
+                      
+                    <td class="date-meal-name">
+                      {% if r.dailymenu %}
+                        {{ r.dailymenu.food.name|default:'' }}
+                        {% if r.dailymenu.drink %}
+                          ، {{ r.dailymenu.drink.name }}
+                        {% endif %}
+                        {% for side in r.dailymenu.side_dishes.all %}
+                          ، {{ side.name }}
+                        {% endfor %}
+                      {% endif %}
+                    </td>
+                    <td class="date-meal-description">{{ r.status.title|default:'-' }}</td>
+                    <td class="date-meal-price">{{ r.reservation_code }}</td>
+                    <td>{{ r.date_status_updated|date:'H:i:s Y/m/d' }}</td>
+                  </tr>
+                {% endfor %}
               </table>
             </div>
           </td>

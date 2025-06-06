@@ -59,7 +59,11 @@
                     <td>
                       <!-- You can place edit/delete icons here if needed -->
                     </td>
-                    <td>{{ reservation.user.get_full_name }}</td>
+                    {% if reservation.guest %}
+                      <td>{{ reservation.guest.first_name|default:'-' }} {{ reservation.guest.last_name|default:'-' }}</td>
+                    {% else %}
+                      <td>{{ reservation.user.first_name|default:'-' }} {{ reservation.user.last_name|default:'-' }}</td>
+                    {% endif %}
                     <td class="date-meal-name">
                       {{ reservation.dailymenu.food.name }}،
                       {{ reservation.dailymenu.drink.name }}،{% for sd in reservation.dailymenu.side_dishes.all %}

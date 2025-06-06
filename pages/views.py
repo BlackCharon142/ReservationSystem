@@ -521,8 +521,51 @@ def admin(request):
 
 @user_passes_test(is_admin)
 def admin_dashboard(request):
+    reservations = (
+        Reservation.objects.select_related(
+            "user", "status", "dailymenu__food", "dailymenu__drink"
+        )
+        .prefetch_related("dailymenu__side_dishes")
+        .order_by("-date_status_updated")[:50]
+    )
+    
+    now = jdatetime.datetime.now()
+
+    # Step 1: get all codes that are canceled/used/expired
+    invalid_codes = Reservation.objects.filter(
+        status__status__in=["canceled", "used", "expired"]
+    ).values_list("reservation_code", flat=True).distinct()
+    
+    print(invalid_codes)
+
+    # Step 2: filter valid reservations
+    active_reservations = Reservation.objects.select_related(
+        "guest", "status", "dailymenu__food", "dailymenu__drink"
+    ).prefetch_related("dailymenu__side_dishes").filter(
+        status__status="reserved",
+        dailymenu__expiration_date__gt=now,
+        guest__isnull=False
+    ).exclude(reservation_code__in=invalid_codes).order_by("dailymenu__expiration_date")
+
+    # Step 3: generate QR codes
+    for res in active_reservations:
+        qr = qrcode.QRCode(box_size=4, border=1)
+        qr.add_data(res.reservation_code)
+        qr.make(fit=True)
+        img = qr.make_image(image_factory=SvgPathImage)
+
+        buf = io.BytesIO()
+        img.save(buf)
+        res.qr_svg = buf.getvalue().decode("utf-8")
+
     return render(
-        request, "admin/admin-dashboard.html", {"active_page": "admin-dashboard"}
+        request,
+        "admin/admin-dashboard.html",
+        {
+            "active_page": "admin-dashboard",
+            "reservations": reservations,
+            "guests_reservations": active_reservations,
+        },
     )
 
 
@@ -591,9 +634,12 @@ def admin_users(request):
 
         return redirect(f"{reverse('admin_users')}?success=1")
 
-
     query = request.GET.get("q", "").strip()
-    users = User.objects.all().select_related("profile").prefetch_related("profile__allowed_meal_type")
+    users = (
+        User.objects.all()
+        .select_related("profile")
+        .prefetch_related("profile__allowed_meal_type")
+    )
 
     if query:
         terms = query.split()
@@ -629,7 +675,9 @@ def admin_users(request):
             "meal_types": MealType.objects.all(),
             "notification": show_notification,
             "notification_status": True,
-            "notification_message": "کاربر با موفقیت ثبت شد!" if show_notification else "",
+            "notification_message": (
+                "کاربر با موفقیت ثبت شد!" if show_notification else ""
+            ),
         },
     )
 
@@ -741,6 +789,8 @@ def admin_foods(request):
             "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
         },
     )
+
+
 @csrf_exempt
 @user_passes_test(is_admin)
 def delete_food(request, id):
@@ -792,6 +842,8 @@ def admin_drinks(request):
             "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
         },
     )
+
+
 @csrf_exempt
 @user_passes_test(is_admin)
 def delete_drink(request, id):
@@ -861,7 +913,8 @@ def flatten_item(item):
                 yield str(v).lower()
         else:
             yield str(value).lower()
-            
+
+
 @csrf_exempt
 @user_passes_test(is_admin)
 def admin_daily_menu_items(request):
@@ -882,8 +935,16 @@ def admin_daily_menu_items(request):
         print(reservation_deadline_ts)
 
         # Convert timestamps to datetime
-        expiration_date = jdatetime.datetime.fromtimestamp(int(expiration_ts)) if expiration_ts else None
-        reservation_deadline = jdatetime.datetime.fromtimestamp(int(reservation_deadline_ts)) if reservation_deadline_ts else None
+        expiration_date = (
+            jdatetime.datetime.fromtimestamp(int(expiration_ts))
+            if expiration_ts
+            else None
+        )
+        reservation_deadline = (
+            jdatetime.datetime.fromtimestamp(int(reservation_deadline_ts))
+            if reservation_deadline_ts
+            else None
+        )
 
         # Create or Update
         if item_id:
@@ -902,7 +963,7 @@ def admin_daily_menu_items(request):
 
         if image:
             item.image = image
-            
+
         print(item.expiration_date)
         print(item.reservation_deadline)
 
@@ -914,44 +975,58 @@ def admin_daily_menu_items(request):
             item.side_dishes.clear()
 
         return redirect(f"{reverse('admin_daily_menu_items')}?success=1")
-    
-    items = DailyMenuItem.objects.select_related(
-        "food", "drink", "meal_type"
-    ).prefetch_related("side_dishes").all().order_by("-expiration_date")
+
+    items = (
+        DailyMenuItem.objects.select_related("food", "drink", "meal_type")
+        .prefetch_related("side_dishes")
+        .all()
+        .order_by("-expiration_date")
+    )
 
     item_list = []
     for item in items:
         exp_ts = int(item.expiration_date.timestamp())
-        rsrv_ts = int(item.reservation_deadline.timestamp()) if item.reservation_deadline else None
+        rsrv_ts = (
+            int(item.reservation_deadline.timestamp())
+            if item.reservation_deadline
+            else None
+        )
         exp_jdt = jdatetime.datetime.fromtimestamp(exp_ts).strftime("%H:%M:%S %Y/%m/%d")
-        rsrv_jdt = jdatetime.datetime.fromtimestamp(rsrv_ts).strftime("%H:%M:%S %Y/%m/%d") if rsrv_ts else ""
+        rsrv_jdt = (
+            jdatetime.datetime.fromtimestamp(rsrv_ts).strftime("%H:%M:%S %Y/%m/%d")
+            if rsrv_ts
+            else ""
+        )
 
-        item_list.append({
-            "id": item.id,
-            "food_id": item.food.id,
-            "food_title": item.food.name,
-            "drink_id": item.drink.id,
-            "drink_title": item.drink.name,
-            "side_dishes_ids": [sd.id for sd in item.side_dishes.all()],
-            "side_dishes_titles": [sd.name for sd in item.side_dishes.all()],
-            "meal_type_id": item.meal_type.id if item.meal_type else "",
-            "meal_type_title": item.meal_type.title if item.meal_type else "",
-            "price": item.price,
-            "quantity": item.quantity,
-            "max_quantity": item.max_purchasable_quantity,
-            "expiration_jalali": exp_jdt,
-            "expiration_timestamp": exp_ts,
-            "reservation_deadline_jalali": rsrv_jdt,
-            "reservation_deadline": rsrv_ts,
-            "image_url": item.image_url,
-        })
-        
+        item_list.append(
+            {
+                "id": item.id,
+                "food_id": item.food.id,
+                "food_title": item.food.name,
+                "drink_id": item.drink.id,
+                "drink_title": item.drink.name,
+                "side_dishes_ids": [sd.id for sd in item.side_dishes.all()],
+                "side_dishes_titles": [sd.name for sd in item.side_dishes.all()],
+                "meal_type_id": item.meal_type.id if item.meal_type else "",
+                "meal_type_title": item.meal_type.title if item.meal_type else "",
+                "price": item.price,
+                "quantity": item.quantity,
+                "max_quantity": item.max_purchasable_quantity,
+                "expiration_jalali": exp_jdt,
+                "expiration_timestamp": exp_ts,
+                "reservation_deadline_jalali": rsrv_jdt,
+                "reservation_deadline": rsrv_ts,
+                "image_url": item.image_url,
+            }
+        )
+
     query = request.GET.get("q", "").strip()
     if query:
         terms = query.split()
         for term in terms:
             item_list = [
-                item for item in item_list
+                item
+                for item in item_list
                 if any(term in str(value).lower() for value in flatten_item(item))
             ]
 
@@ -971,6 +1046,8 @@ def admin_daily_menu_items(request):
             "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
         },
     )
+
+
 @csrf_exempt
 @user_passes_test(is_admin)
 def delete_daily_menu_item(request, id):
@@ -980,11 +1057,12 @@ def delete_daily_menu_item(request, id):
         return HttpResponse(status=200)
     return HttpResponseNotAllowed(["POST"])
 
+
 @user_passes_test(is_admin)
 def admin_reservations(request):
     query = request.GET.get("q", "").strip()
     reservations = Reservation.objects.select_related(
-        "user", "status", "dailymenu__food", "dailymenu__drink"
+        "user", "status", "dailymenu__food", "dailymenu__drink", "guest"
     ).prefetch_related("dailymenu__side_dishes")
 
     if query:
@@ -993,7 +1071,7 @@ def admin_reservations(request):
             status_value = {
                 "رزرو شده": "reserved",
                 "مصرف شده": "used",
-                "لغو شده": "canceled",
+                "کنسل شده": "canceled",
                 "منقضی شده": "expired",
             }.get(term)
 
@@ -1030,44 +1108,160 @@ def admin_reservations(request):
 @user_passes_test(is_admin)
 def admin_guests(request):
     if request.method == "POST":
-        guest_id = request.POST.get("id")
-        first_name = request.POST.get("first_name", "").strip()
-        last_name = request.POST.get("last_name", "").strip()
-        email = request.POST.get("email", "").strip()
-        phone = request.POST.get("phone_number", "").strip()
+        form_type = request.POST.get("form_type")
 
-        if guest_id:  # Edit
+        if form_type == "guest":
+            guest_id = request.POST.get("id")
+            first_name = request.POST.get("first_name", "").strip()
+            last_name = request.POST.get("last_name", "").strip()
+            email = request.POST.get("email", "").strip()
+            phone = request.POST.get("phone_number", "").strip()
+
+            if guest_id:  # Edit
+                guest = get_object_or_404(Guest, id=guest_id)
+                guest.first_name = first_name
+                guest.last_name = last_name
+                guest.email = email
+                guest.phone_number = phone
+                guest.save()
+            else:  # New
+                Guest.objects.create(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phone_number=phone,
+                )
+            return redirect(f"{reverse('admin_guests')}?success=1")
+        elif form_type == "reservation":
+            reservation_id = request.POST.get("reservation_id")
+            guest_id = request.POST.get("guest_id")
+            dailymenu_id = request.POST.get("menu_id")
+
+            if not guest_id or not dailymenu_id:
+                return JsonResponse(
+                    {"error": "Missing fields", "gd": guest_id, "md": dailymenu_id},
+                    status=400,
+                )
+
             guest = get_object_or_404(Guest, id=guest_id)
-            guest.first_name = first_name
-            guest.last_name = last_name
-            guest.email = email
-            guest.phone_number = phone
-            guest.save()
-        else:  # New
-            Guest.objects.create(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                phone_number=phone
-            )
+            menu_item = get_object_or_404(DailyMenuItem, id=dailymenu_id)
 
-        return redirect(f"{reverse('admin_guests')}?success=1")
+            if reservation_id:  # ✏️ EDIT
+                current_reservation = get_object_or_404(Reservation, id=reservation_id)
+                code = current_reservation.reservation_code
+                exp_date = current_reservation.dailymenu.expiration_date
+
+                # Find all reservations with same code & expiration date
+                matching_reservations = Reservation.objects.filter(
+                    reservation_code=code, dailymenu__expiration_date=exp_date
+                )
+
+                for r in matching_reservations:
+                    r.guest = guest
+                    r.dailymenu = menu_item
+                    r.user = request.user  # who changed it
+                    r.date_status_updated = jdatetime.datetime.now()
+                    r.save()
+
+            else:  # ➕ ADD NEW
+                # Find default status (e.g., "Reserved")
+                try:
+                    default_status = Status.objects.get(title="رزرو شده")
+                except Status.DoesNotExist:
+                    return JsonResponse(
+                        {"error": "Default status not found."}, status=500
+                    )
+
+                for _ in range(5):
+                    code = make_reservation_code(request.user, menu_item)
+                    if not Reservation.objects.filter(reservation_code=code).exists():
+                        break
+                else:
+                    return JsonResponse({"error": "Try again later."}, status=500)
+
+                Reservation.objects.create(
+                    user=request.user,
+                    guest=guest,
+                    dailymenu=menu_item,
+                    status=default_status,
+                    reservation_code=code,
+                    date_status_updated=timezone.now(),
+                )
+
+            return redirect(f"{reverse('admin_guests')}?success=1")
 
     # GET method
     show_notification = request.GET.get("success") == "1"
 
     query = request.GET.get("q", "").strip()
-    guests = Guest.objects.all().order_by("-id")
 
+    # --- Filter Guests ---
+    guests = Guest.objects.all().order_by("-id")
     if query:
         terms = query.split()
         for term in terms:
             guests = guests.filter(
-                Q(first_name__icontains=term) |
-                Q(last_name__icontains=term) |
-                Q(email__icontains=term) |
-                Q(phone_number__icontains=term)
+                Q(first_name__icontains=term)
+                | Q(last_name__icontains=term)
+                | Q(email__icontains=term)
+                | Q(phone_number__icontains=term)
             )
+
+    # --- Filter Reservations ---
+    reservations = (
+        Reservation.objects.select_related(
+            "guest", "dailymenu__food", "dailymenu__drink", "status"
+        )
+        .prefetch_related("dailymenu__side_dishes")
+        .filter(guest__isnull=False)
+        .order_by("-date_status_updated")
+    )
+
+    if query:
+        terms = query.split()
+        for term in terms:
+            reservations = reservations.filter(
+                Q(reservation_code__icontains=term)
+                | Q(guest__first_name__icontains=term)
+                | Q(guest__last_name__icontains=term)
+                | Q(guest__email__icontains=term)
+                | Q(guest__phone_number__icontains=term)
+                | Q(dailymenu__food__name__icontains=term)
+                | Q(dailymenu__drink__name__icontains=term)
+                | Q(dailymenu__side_dishes__name__icontains=term)
+                | Q(status__title__icontains=term)
+            ).distinct()
+
+    reservation_list = []
+    for r in reservations:
+        dailymenu = r.dailymenu
+        side_titles = [s.name for s in dailymenu.side_dishes.all()] if dailymenu else []
+
+        full_menu = []
+        if dailymenu:
+            full_menu.append(dailymenu.food.name if dailymenu.food else "")
+            if dailymenu.drink:
+                full_menu.append(dailymenu.drink.name)
+            if side_titles:
+                full_menu.extend(side_titles)
+
+        jalali_updated = r.date_status_updated.strftime("%Y/%m/%d %H:%M:%S")
+
+        reservation_list.append(
+            {
+                "id": r.id,
+                "guest_id": r.guest.id,
+                "guest_name": (
+                    f"{r.guest.first_name} {r.guest.last_name}" if r.guest else "-"
+                ),
+                "menu_id": r.dailymenu.id,
+                "menu_summary": "، ".join(full_menu),
+                "status_id": r.status.id,
+                "status": r.status.title if r.status else "-",
+                "code": r.reservation_code,
+                "updated": jalali_updated,
+            }
+        )
 
     return render(
         request,
@@ -1075,11 +1269,18 @@ def admin_guests(request):
         {
             "active_page": "admin-guests",
             "guests": guests,
+            "guests_options": Guest.objects.all(),
+            "dailymenus": DailyMenuItem.objects.filter(
+                expiration_date__gt=jdatetime.datetime.now()
+            ),
+            "reservations": reservation_list,
             "notification": show_notification,
             "notification_status": True,
             "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
         },
     )
+
+
 @csrf_exempt
 @user_passes_test(is_admin)
 def delete_guest(request, id):
@@ -1088,3 +1289,40 @@ def delete_guest(request, id):
         guest.delete()
         return HttpResponse(status=200)
     return HttpResponseNotAllowed(["POST"])
+
+
+@require_POST
+@user_passes_test(is_admin)
+def cancel_reservation(request):
+    try:
+        res_id = request.POST.get("id")
+        original = get_object_or_404(Reservation, id=res_id)
+
+        # Get the current user
+        user = request.user
+
+        # Create new Reservation with status = "کنسل شده"
+        cancel_status = Status.objects.get(title="کنسل شده")
+
+        Reservation.objects.create(
+            user=user,
+            guest=original.guest,
+            dailymenu=original.dailymenu,
+            status=cancel_status,
+            reservation_code=original.reservation_code,
+        )
+
+        return JsonResponse({"success": True})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+def make_reservation_code(user, menu_item):
+    raw = (
+        f"{user.id}-{menu_item.id}-"
+        f"{menu_item.expiration_date.timestamp()}-"
+        f"{random.random()}"
+    )
+    num = int(hashlib.sha256(raw.encode()).hexdigest(), 16) % 10**8
+    return f"{num:08d}"

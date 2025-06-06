@@ -45,6 +45,7 @@
         <div class="add-user-widget text">
           <form id="guest-form" method="post" class="add-edit-form">
             {% csrf_token %}
+            <input type="hidden" name="form_type" value="guest" />
             <input type="hidden" name="id" id="guest-id" />
 
             <div class="input-container">
@@ -80,31 +81,38 @@
       </div>
       <div class="accordion-content">
         <div class="add-user-widget text">
-          <form class="add-edit-form">
+          <form class="add-edit-form" id="reservation-form" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="reservation" />
+            <input type="hidden" name="reservation_id" id="reservation-id" />
+
             <div class="input-container user-container">
               <label>کاربر در حال رزرو:</label>
-              <input type="text" />
+              <input type="text" id="user-info" name="user" readonly value="{{ request.user.first_name }} {{ request.user.last_name }} ({{ request.user.username }})" />
             </div>
+
             <div class="input-container guest-container">
               <label>میهمان:</label>
-              <select>
-                <option value="" disabled selected>Select food</option>
-                <option value="pizza">Pizza</option>
-                <option value="burger">Burger</option>
-                <option value="salad">Salad</option>
-                <option value="pasta">Pasta</option>
+              <select id="guest-select" name="guest_id">
+                <option value="" disabled selected>انتخاب میهمان</option>
+                {% for guest_option in guests_options %}
+                  <option value="{{ guest_option.id }}">{{ guest_option.first_name }} {{ guest_option.last_name }}</option>
+                {% endfor %}
               </select>
             </div>
+
             <div class="input-container meal-container">
               <label>غذا:</label>
-              <select>
-                <option value="" disabled selected>Select food</option>
-                <option value="pizza">Pizza</option>
-                <option value="burger">Burger</option>
-                <option value="salad">Salad</option>
-                <option value="pasta">Pasta</option>
+              <select id="meal-select" name="menu_id">
+                <option value="" disabled selected>انتخاب غذا</option>
+                {% for menu in dailymenus %}
+                  <option value="{{ menu.id }}">{{ menu.food.name }} + {{ menu.drink.name }}</option>
+                {% endfor %}
               </select>
             </div>
+
+            <input type="hidden" id="reservation-code" name="reservation_code" maxlength="8" />
+
             <div class="input-container submit-button-container">
               <input type="submit" value="ثبت" />
             </div>
@@ -135,7 +143,7 @@
                 {% for guest in guests %}
                   <tr class="reservation-log-row" data-id="{{ guest.id }}" data-first-name="{{ guest.first_name }}" data-last-name="{{ guest.last_name }}" data-email="{{ guest.email }}" data-phone="{{ guest.phone_number }}">
                     <td class="date-meal-actions">
-                      <i class="fas fa-edit edit-guest" data-id="{{ guest.id }}"  onclick="toggleAccordion(document.getElementById('guest-add-edit-form-accordion'), true);"></i>&nbsp;&nbsp;&nbsp;
+                      <i class="fas fa-edit edit-guest" data-id="{{ guest.id }}" onclick="toggleAccordion(document.getElementById('guest-add-edit-form-accordion'), true);"></i>&nbsp;&nbsp;&nbsp;
                       <i class="fas fa-trash delete-guest" data-id="{{ guest.id }}"></i>
                     </td>
                     <td>{{ guest.first_name }} {{ guest.last_name }}</td>
@@ -171,166 +179,19 @@
           <td>
             <div class="reservation-log-list">
               <table width="100%" cellspacing="0" cellpadding="0">
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
+                {% for r in reservations %}
+                  <tr class="reservation-log-row" data-id="{{ r.id }}" data-guest-id="{{ r.guest_id }}" data-menu-id="{{ r.menu_id }}" data-status-id="{{ r.status_id }}" data-code="{{ r.code }}">
+                    <td class="date-meal-actions">
+                      <i class="fas fa-edit edit-reservation" onclick="toggleAccordion(document.getElementById('guest-food-add-edit-form-accordion'), true);"></i>&nbsp;&nbsp;&nbsp;
+                      <i class="fas fa-times cancel-reservation" data-id="{{ r.id }}"></i>
+                    </td>
+                    <td>{{ r.guest_name }}</td>
+                    <td class="date-meal-name">{{ r.menu_summary }}</td>
+                    <td class="date-meal-description">{{ r.status }}</td>
+                    <td class="date-meal-price">{{ r.code }}</td>
+                    <td>{{ r.updated }}</td>
+                  </tr>
+                {% endfor %}
               </table>
             </div>
           </td>
