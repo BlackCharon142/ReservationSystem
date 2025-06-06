@@ -19,26 +19,26 @@ class LoginForm(AuthenticationForm):
 class RecoveryForm(forms.Form):
     answer_1 = forms.CharField(
         max_length=255,
-        widget=forms.PasswordInput(attrs={'class': 'text'}),
+        widget=forms.TextInput(attrs={'class': 'text'}),
         label="نام بهترین دوست دوران کودکیتان چه بود؟",
     )
     answer_2 = forms.CharField(
         max_length=255,
-        widget=forms.PasswordInput(attrs={'class': 'text'}),
+        widget=forms.TextInput(attrs={'class': 'text'}),
         label="مدل یا برند اولین وسیله نقلیه تان چه بود؟"
     )
     answer_3 = forms.CharField(
         max_length=255,
-        widget=forms.PasswordInput(attrs={'class': 'text'}),
+        widget=forms.TextInput(attrs={'class': 'text'}),
         label="نام حیوان خانگی محبوبتان در دوران کودکی چه بود؟"
     )
     answer_4 = forms.CharField(
         max_length=255,
-        widget=forms.PasswordInput(attrs={'class': 'text'}),
+        widget=forms.TextInput(attrs={'class': 'text'}),
         label="نام خیابانی که اولین خانه تان در آن قرار داشت چه بود؟"
     )
     answer_5 = forms.CharField(
         max_length=255,
-        widget=forms.PasswordInput(attrs={'class': 'text'}),
+        widget=forms.TextInput(attrs={'class': 'text'}),
         label="نام معلم مورد علاقه تان در دوران تحصیل چه بود؟"
     )
