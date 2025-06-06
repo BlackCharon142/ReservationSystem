@@ -304,6 +304,7 @@ tr.reservation-log-row td img {
     max-width: 50px;
     height: auto;
     border-radius: 3px;
+    object-fit: cover;
 }
 
 .reservation-log-row {
@@ -355,6 +356,8 @@ tr.reservation-log-row td img {
 .input-container input[type="email"],
 .input-container input[type="tel"],
 .input-container input[type="number"],
+.input-container input[type="password"],
+.input-container select,
 .input-container input[type="file"] {
     padding: 10px 12px;
     border-radius: 8px;
@@ -371,11 +374,14 @@ tr.reservation-log-row td img {
 .input-container input[type="email"]:focus,
 .input-container input[type="tel"]:focus,
 .input-container input[type="number"]:focus,
+.input-container input[type="password"]:focus,
+.input-container select,
 .input-container input[type="file"]:focus {
     border-color: #FFA500;
 }
 
 .input-container img {
+    aspect-ratio: 1;
     max-height: 45px;
     width: auto;
     display: none;

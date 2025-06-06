@@ -16,8 +16,11 @@ urlpatterns = [
     
     # ADMIN URLs
     path('admin/', views.admin_dashboard, name='admin'),
+    
     path('admin/dashboard', views.admin_dashboard, name='admin_dashboard'),
+    
     path('admin/users/', views.admin_users, name='admin_users'),
+    path('admin/users/delete/<int:id>/', views.delete_user, name='delete_users'),
     
     path('admin/password-recovery-requests/', views.admin_password_recovery_requests, name='admin_password_recovery_requests'),
     
@@ -31,6 +34,10 @@ urlpatterns = [
     path('admin/sidedishes/delete/<int:id>/', views.delete_sidedish, name='delete_sidedish'),
     
     path('admin/daily-menu-items', views.admin_daily_menu_items, name='admin_daily_menu_items'),
+    path('admin/daily-menu-items/delete/<int:id>/', views.delete_daily_menu_item, name='delete_daily_menu_item'),
+    
     path('admin/reservations', views.admin_reservations, name='admin_reservations'),
+    
     path('admin/guests', views.admin_guests, name='admin_guests'),
+    path('admin/guests/delete/<int:id>/', views.delete_guest, name='delete_guests'),
 ]

@@ -14,7 +14,7 @@ class MealType(models.Model):
     meal_type = models.CharField(max_length=10, unique=True, choices=MEAL_TYPE_CHOICES)
 
     def __str__(self):
-        return f"{self.title} [{self.meal_type}]"
+        return self.title
 
 class DailyMenuItem(models.Model):
     food = models.ForeignKey(Food, on_delete=models.CASCADE, related_name='daily_menus')
@@ -41,8 +41,8 @@ class DailyMenuItem(models.Model):
         return self.food.image_url
 
     def save(self, *args, **kwargs):
-        if not self.image and self.food.image:
-            self.image = self.food.image
+        #if not self.image and self.food.image:
+        #    self.image = self.food.image
         if not self.reservation_deadline:
             self.reservation_deadline = self.expiration_date
         super().save(*args, **kwargs)

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (searchQuery && searchQuery.trim() !== "") {
     const toggle = document.getElementById("search-accordion-toggle");
     if (toggle) {
-      toggleAccordion(toggle, true); // 👈 force open
+      toggleAccordion(toggle, true);
     }
   }
 });

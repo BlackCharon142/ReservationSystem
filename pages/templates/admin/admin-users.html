@@ -14,15 +14,15 @@
 {% block admin_content %}
   <div class="accordion">
     <div class="accordion-item">
-      <div class="accordion-title text" onclick="toggleAccordion(this)">
+      <div class="accordion-title text" id="search-accordion-toggle" onclick="toggleAccordion(this)">
         <h3 class="widget-title">جستجو</h3>
       </div>
       <div class="accordion-content">
         <div class="search-widget text">
-          <form class="search-form">
+          <form class="search-form" method="get">
             <div class="input-container search-container">
               <label>جستجو :</label>
-              <input type="text" />
+              <input type="text" name="q" value="{{ request.GET.q }}" />
             </div>
             <div class="input-container submit-button-container">
               <input type="submit" value="جستجو" />
@@ -32,75 +32,94 @@
       </div>
     </div>
     <div class="accordion-item">
-      <div class="accordion-title text" onclick="toggleAccordion(this)">
+      <div id="user-add-edit-form-accordion" class="accordion-title text" onclick="toggleAccordion(this)">
         <h3 class="widget-title">افزودن و ویرایش کاربر</h3>
       </div>
       <div class="accordion-content">
         <div class="add-user-widget text">
-          <form class="add-edit-form">
+          <form class="add-edit-form" id="user-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" id="user-id" name="id" />
+
             <div class="input-container username-container">
               <label>نام کاربری :</label>
-              <input type="text" />
+              <input type="text" id="user-username" name="username" required />
             </div>
+
             <div class="input-container firstname-container">
               <label>نام:</label>
-              <input type="text" />
+              <input type="text" id="user-firstname" name="first_name" required />
             </div>
+
             <div class="input-container lastname-container">
               <label>نام خانوادگی:</label>
-              <input type="text" />
+              <input type="text" id="user-lastname" name="last_name" required />
             </div>
+
             <div class="input-container email-container">
               <label>ایمیل:</label>
-              <input type="email" />
+              <input type="email" id="user-email" name="email" />
             </div>
+
             <div class="input-container tel-container">
               <label>تلفن:</label>
-              <input type="tel" />
+              <input type="tel" id="user-phone" name="phone_number" />
             </div>
+
+            <div class="input-container wallet-container">
+              <label>موجودی کیف پول:</label>
+              <input type="number" id="user-wallet" name="wallet_balance" min="0" />
+            </div>
+
+            <div class="input-container password-container">
+              <label>رمز عبور:</label>
+              <input type="password" name="password" />
+            </div>
+
             <div class="input-container profile-container">
               <label>پروفایل:</label>
-              <input type="file" />
+              <span>
+                <input type="file" name="profile_image" id="profile-image" accept="image/*" />
+                <img id="current-profile-image" src="" />
+              </span>
             </div>
+
             <div class="input-container allowed-meals-container">
               <label>وعده مجاز:</label>
-              <span>
-                <input type="checkbox" id="breakfast" name="allowed-meals" />
-                <label for="breakfast">صبحانه</label>
-              </span>
-              <span>
-                <input type="checkbox" id="launch" name="allowed-meals" />
-                <label for="launch">نهار</label>
-              </span>
-              <span>
-                <input type="checkbox" id="dinner" name="allowed-meals" />
-                <label for="dinner">شام</label>
-              </span>
-              <span>
-                <input type="checkbox" id="snack" name="allowed-meals" />
-                <label for="snack">میان وعده</label>
-              </span>
+              {% for meal in meal_types %}
+                <span>
+                  <input type="checkbox" id="allowed-{{ meal.title|lower }}" name="allowed_meals" value="{{ meal.id }}" />
+                  <label for="allowed-{{ meal.title|lower }}">{{ meal.title }}</label>
+                </span>
+              {% endfor %}
             </div>
-            <div class="input-container security-answer-1-container">
+
+            <div class="input-container is-admin-container">
+              <label>مدیر سیستم:</label>
+              <input type="checkbox" id="user-is-admin" name="is_superuser" />
+            </div>
+
+            <div class="input-container security-answer-container">
               <label>نام بهترین دوست دوران کودکیتان چه بود؟</label>
-              <input type="text" />
+              <input type="text" name="security_answer_1" />
             </div>
-            <div class="input-container security-answer-2-container">
+            <div class="input-container security-answer-container">
               <label>مدل یا برند اولین وسیله نقلیه تان چه بود؟</label>
-              <input type="text" />
+              <input type="text" name="security_answer_2" />
             </div>
-            <div class="input-container security-answer-3-container">
+            <div class="input-container security-answer-container">
               <label>نام حیوان خانگی محبوبتان در دوران کودکی چه بود؟</label>
-              <input type="text" />
+              <input type="text" name="security_answer_3" />
             </div>
-            <div class="input-container security-answer-4-container">
+            <div class="input-container security-answer-container">
               <label>نام خیابانی که اولین خانه تان در آن قرار داشت چه بود؟</label>
-              <input type="text" />
+              <input type="text" name="security_answer_4" />
             </div>
-            <div class="input-container security-answer-5-container">
+            <div class="input-container security-answer-container">
               <label>نام معلم مورد علاقه تان در دوران تحصیل چه بود؟</label>
-              <input type="text" />
+              <input type="text" name="security_answer_5" />
             </div>
+
             <div class="input-container submit-button-container">
               <input type="submit" value="ثبت" />
             </div>
@@ -119,10 +138,10 @@
               <tr>
                 <th></th>
                 <th>نام و نام خانوادگی</th>
-                <th>غذا رزرو شده</th>
-                <th>وضعیت</th>
-                <th>کد</th>
-                <th>تاریخ ثبت</th>
+                <th>وعده های مجاز</th>
+                <th>تلفن</th>
+                <th>نوع</th>
+                <th></th>
               </tr>
             </table>
           </td>
@@ -131,86 +150,30 @@
           <td>
             <div class="reservation-log-list">
               <table width="100%" cellspacing="0" cellpadding="0">
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>
-                  </td>
-                  <td>دونالد ترامپ</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">مصرف شده</td>
-                  <td class="date-meal-price">۰۲۸۴۶۲۷۳</td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                </tr>
+                {% for user in users %}
+                  <tr class="reservation-log-row" data-id="{{ user.id }}" data-username="{{ user.username }}" data-email="{{ user.email }}" data-wallet="{{ user.profile.wallet_balance }}" data-phone="{{ user.profile.phone_number }}" data-admin="{{ user.is_superuser }}" data-security-answer1="{{ user.profile.security_answer_1 }}" data-security-answer2="{{ user.profile.security_answer_2 }}" data-security-answer3="{{ user.profile.security_answer_3 }}" data-security-answer4="{{ user.profile.security_answer_4 }}" data-security-answer5="{{ user.profile.security_answer_5 }}"
+                    {% if user.profile.image %}
+                        data-image-url="{{ user.profile.image_url }}"
+                    {% else %}
+                        data-image-url=""
+                    {% endif %}>
+                    <td class="date-meal-actions">
+                      <i class="fas fa-edit edit-user" data-id="{{ user.id }}" onclick="toggleAccordion(document.getElementById('user-add-edit-form-accordion'), true)"></i>
+                      &nbsp;
+                      <i class="fas fa-trash delete-user" data-id="{{ user.id }}"></i>
+                    </td>
+                    <td class="user-fullname">
+                      <span class="user-firstname">{{ user.first_name }}</span>
+                      <span class="user-lastname">{{ user.last_name }}</span>
+                    </td>
+                    <td class="user-meals">{{ user.profile.allowed_meal_type.all|join:', ' }}</td>
+                    <td class="user-phone">{{ user.profile.phone_number }}</td>
+                    <td class="user-admin">{{ user.is_superuser|yesno:'مدیر,کاربر' }}</td>
+                    <td class="user-profile-pic">
+                      <img src="{{ user.profile.image_url }}" />
+                    </td>
+                  </tr>
+                {% endfor %}
               </table>
             </div>
           </td>
@@ -220,4 +183,5 @@
   </div>
 
   <script src="{% static '/script/admin/admin-panel.js' %}"></script>
+  <script src="{% static '/script/admin/admin-users.js' %}"></script>
 {% endblock %}

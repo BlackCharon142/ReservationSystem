@@ -19,15 +19,15 @@
 {% block admin_content %}
   <div class="accordion">
     <div class="accordion-item">
-      <div class="accordion-title text" onclick="toggleAccordion(this)">
+      <div class="accordion-title text" id="search-accordion-toggle" onclick="toggleAccordion(this)">
         <h3 class="widget-title">جستجو</h3>
       </div>
       <div class="accordion-content">
         <div class="search-widget text">
-          <form class="search-form">
+          <form class="search-form" method="get">
             <div class="input-container search-container">
               <label>جستجو :</label>
-              <input type="text" />
+              <input type="text" name="q" value="{{ request.GET.q }}" />
             </div>
             <div class="input-container submit-button-container">
               <input type="submit" value="جستجو" />
@@ -37,92 +37,103 @@
       </div>
     </div>
     <div class="accordion-item">
-      <div class="accordion-title text" onclick="toggleAccordion(this)">
+      <div id="daily-menu-add-edit-form-accordion"  class="accordion-title text" onclick="toggleAccordion(this)">
         <h3 class="widget-title">افزودن و ویرایش منوی روزانه</h3>
       </div>
       <div class="accordion-content">
         <div class="add-user-widget text">
-          <form class="add-edit-form">
+          <form class="add-edit-form" id="daily-menu-form" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="daily-menu-id">
             <div class="input-container food-container">
-              <label>غذا :</label>
-              <select>
-                <option value="" disabled selected>Select food</option>
-                <option value="pizza">Pizza</option>
-                <option value="burger">Burger</option>
-                <option value="salad">Salad</option>
-                <option value="pasta">Pasta</option>
+              <label for="food">غذا :</label>
+              <select name="food" id="food">
+                <option value="" disabled selected>انتخاب کنید</option>
+                {% for food in foods %}
+                  <option value="{{ food.id }}">{{ food.name }}</option>
+                {% endfor %}
               </select>
             </div>
+
             <div class="input-container drink-container">
-              <label>نوشیدنی :</label>
-              <select>
-                <option value="" disabled selected>Select food</option>
-                <option value="pizza">Pizza</option>
-                <option value="burger">Burger</option>
-                <option value="salad">Salad</option>
-                <option value="pasta">Pasta</option>
+              <label for="drink">نوشیدنی :</label>
+              <select name="drink" id="drink">
+                <option value="" disabled selected>انتخاب کنید</option>
+                {% for drink in drinks %}
+                  <option value="{{ drink.id }}">{{ drink.name }}</option>
+                {% endfor %}
               </select>
             </div>
+
             <div class="input-container sidedishes-container">
               <label>مخلفات :</label>
-              <div class="checkbox-multiselect">
-                <label><input type="checkbox" name="food" value="pizza" />Pizza</label>
-                <label><input type="checkbox" name="food" value="burger" />Burger</label>
-                <label><input type="checkbox" name="food" value="salad" />Salad</label>
-                <label><input type="checkbox" name="food" value="pasta" />Pasta</label>
-                <label><input type="checkbox" name="food" value="sushi" />Sushi</label>
-                <label><input type="checkbox" name="food" value="taco" />Taco</label>
-                <label><input type="checkbox" name="food" value="noodles" />Noodles</label>
-                <label><input type="checkbox" name="food" value="steak" />Steak</label>
-                <label><input type="checkbox" name="food" value="curry" />Curry</label>
-                <label><input type="checkbox" name="food" value="sandwich" />Sandwich</label>
-                <label><input type="checkbox" name="food" value="soup" />Soup</label>
-                <label><input type="checkbox" name="food" value="rice" />Rice</label>
+              <div class="checkbox-multiselect" id="side_dishes">
+                {% for side in side_dishes %}
+                  <label>
+                    <input type="checkbox" name="side_dishes" value="{{ side.id }}" />
+                    {{ side.name }}
+                  </label>
+                {% endfor %}
               </div>
             </div>
+
             <div class="input-container meal-type-container">
-              <label>وعده :</label>
-              <select>
-                <option value="" disabled selected>Select food</option>
-                <option value="pizza">Pizza</option>
-                <option value="burger">Burger</option>
-                <option value="salad">Salad</option>
-                <option value="pasta">Pasta</option>
+              <label for="meal_type">وعده :</label>
+              <select name="meal_type" id="meal_type">
+                <option value="" disabled selected>انتخاب کنید</option>
+                {% for mt in meal_types %}
+                  <option value="{{ mt.id }}">{{ mt.title }}</option>
+                {% endfor %}
               </select>
             </div>
+
             <div class="input-container quantity-container">
-              <label>موجودی:</label>
-              <input type="number" />
+              <label for="quantity">موجودی:</label>
+              <input type="number" name="quantity" id="quantity" />
             </div>
+
             <div class="input-container max-purchasable-container">
-              <label>حداکثر میزان خرید هر کابر:</label>
-              <input type="number" />
+              <label for="max_purchasable_quantity">حداکثر میزان خرید هر کاربر:</label>
+              <input type="number" name="max_purchasable_quantity" id="max_purchasable_quantity" />
             </div>
+
             <div class="input-container image-container">
-              <label>عکس:</label>
-              <input type="file" accept="image/*" />
+              <label for="image">عکس:</label>
+              <span>
+                <input type="file" name="image" id="image" accept="image/*" />
+                <img id="current-image" src="" />
+              </span>
             </div>
+
             <div class="input-container reservation-deadline-container">
-              <label>تاریخ پایان مهلت رزرو:</label>
+              <label for="reservation_deadline">تاریخ پایان مهلت رزرو:</label>
               <div class="date-selection">
                 <div class="date-picker-wrapper">
-                  <input type="text" placeholder="تاریخ مورد نظر را انتخاب کنید" class="date-picker text" value="" />
+                  <input type="text" readonly name="reservation_deadline_display" id="reservation_deadline_display" class="date-picker text" placeholder="تاریخ مورد نظر را انتخاب کنید" />
+                  <input type="hidden" name="reservation_deadline" id="reservation_deadline" />
                   <button type="button" class="clear-date" aria-label="پاک کردن تاریخ">&times;</button>
                 </div>
               </div>
             </div>
+
             <div class="input-container expiration-date-container">
-              <label>تاریخ پایان مهلت استفاده:</label>
+              <label for="expiration_date">تاریخ پایان مهلت استفاده:</label>
               <div class="date-selection">
                 <div class="date-picker-wrapper">
-                  <input type="text" placeholder="تاریخ مورد نظر را انتخاب کنید" class="date-picker text" value="" />
+                  <input type="text" readonly name="expiration_date_display" id="expiration_date_display" class="date-picker text" placeholder="تاریخ مورد نظر را انتخاب کنید" />
+                  <input type="hidden" name="expiration_date" id="expiration_date" />
                   <button type="button" class="clear-date" aria-label="پاک کردن تاریخ">&times;</button>
                 </div>
               </div>
             </div>
+
             <div class="input-container price-container">
-              <label>قیمت:</label>
-              <input type="number" />
+              <label for="price">قیمت:</label>
+              <input type="number" name="price" id="price" />
+            </div>
+
+            <div class="input-container submit-button-container">
+              <input type="submit" value="ثبت" />
             </div>
           </form>
         </div>
@@ -151,86 +162,23 @@
           <td>
             <div class="reservation-log-list">
               <table width="100%" cellspacing="0" cellpadding="0">
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
-                <tr class="reservation-log-row" data-meal-id>
-                  <td class="date-meal-actions">
-                    <i class="fas fa-edit"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-trash"></i>
-                  </td>
-                  <td>۱۴۰۴/۰۲/۲۷ ۱۷:۰۶:۵۳</td>
-                  <td class="date-meal-name">خورشت قیمه، ماست و زیتون، دوغ</td>
-                  <td class="date-meal-description">صبحانه</td>
-                  <td class="date-meal-price">5</td>
-                  <td>50000 تومان</td>
-                </tr>
+                {% for item in items %}
+                  <tr class="reservation-log-row" data-id="{{ item.id }}" data-reservation-deadline="{{ item.reservation_deadline }}" data-expiration="{{ item.expiration_timestamp }}" data-food="{{ item.food_id }}" data-drink="{{ item.drink_id }}" data-sides="{{ item.side_dishes_ids }}" data-meal-type="{{ item.meal_type_id }}" data-price="{{ item.price }}" data-quantity="{{ item.quantity }}" data-max="{{ item.max_quantity }}" data-image-url="{{ item.image_url }}" onclick="toggleAccordion(document.getElementById('daily-menu-add-edit-form-accordion'), true);">
+                    <td class="date-meal-actions">
+                      <i class="fas fa-edit edit-daily-menu" data-id="{{ item.id }}"></i>&nbsp;&nbsp;&nbsp;
+                      <i class="fas fa-trash delete-daily-menu" data-id="{{ item.id }}"></i>
+                    </td>
+                    <td>{{ item.expiration_jalali }}</td>
+                    <td class="date-meal-name">
+                      {{ item.food_title }}، {{ item.drink_title }}{% if item.side_dishes_titles %}
+                        ، {{ item.side_dishes_titles|join:'، ' }}
+                      {% endif %}
+                    </td>
+                    <td class="date-meal-description">{{ item.meal_type_title }}</td>
+                    <td class="date-meal-price">{{ item.quantity }}</td>
+                    <td>{{ item.price }}</td>
+                  </tr>
+                {% endfor %}
               </table>
             </div>
           </td>
@@ -240,6 +188,7 @@
   </div>
 
   <script src="{% static '/script/admin/admin-panel.js' %}"></script>
+  <script src="{% static '/script/admin/admin-daily-menu-items.js' %}"></script>
 
   <script type="text/javascript">
     $(function () {

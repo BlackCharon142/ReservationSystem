@@ -21,8 +21,9 @@ from django.urls import reverse
 
 import hashlib, random
 
-from users.models import Profile, RecoveryRequest
-from daily_menus.models import DailyMenuItem
+from django.contrib.auth.models import User
+from users.models import Profile, RecoveryRequest, Guest
+from daily_menus.models import DailyMenuItem, MealType
 from menu_items.models import Food, Drink, SideDish
 from reservations.models import Reservation, Status
 
@@ -525,9 +526,122 @@ def admin_dashboard(request):
     )
 
 
+@csrf_exempt
 @user_passes_test(is_admin)
 def admin_users(request):
-    return render(request, "admin/admin-users.html", {"active_page": "admin-users"})
+    if request.method == "POST":
+        user_id = request.POST.get("id")
+        username = request.POST.get("username", "").strip()
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        email = request.POST.get("email", "").strip()
+        phone = request.POST.get("phone_number", "").strip()
+        wallet = request.POST.get("wallet_balance", "0")
+        password = request.POST.get("password", "").strip()
+        is_admin = request.POST.get("is_superuser") == "on"
+        allowed_meals_ids = request.POST.getlist("allowed_meals")
+        image = request.FILES.get("profile_image")
+
+        # Security Questions
+        security_answer_1 = request.POST.get("security_answer_1", "").strip()
+        security_answer_2 = request.POST.get("security_answer_2", "").strip()
+        security_answer_3 = request.POST.get("security_answer_3", "").strip()
+        security_answer_4 = request.POST.get("security_answer_4", "").strip()
+        security_answer_5 = request.POST.get("security_answer_5", "").strip()
+
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+            user.username = username
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            user.is_superuser = is_admin
+            user.is_staff = is_admin
+            if password:
+                user.set_password(password)
+            user.save()
+        else:
+            user = User.objects.create_user(
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                password=password or User.objects.make_random_password(),
+                is_superuser=is_admin,
+                is_staff=is_admin,
+            )
+
+        profile, _ = Profile.objects.get_or_create(user=user)
+        profile.phone_number = phone
+        profile.wallet_balance = wallet
+        if image:
+            profile.image = image
+        if security_answer_1:
+            profile.security_answer_1 = security_answer_1
+        if security_answer_2:
+            profile.security_answer_2 = security_answer_2
+        if security_answer_3:
+            profile.security_answer_3 = security_answer_3
+        if security_answer_4:
+            profile.security_answer_4 = security_answer_4
+        if security_answer_5:
+            profile.security_answer_5 = security_answer_5
+        profile.save()
+        profile.allowed_meal_type.set(allowed_meals_ids)
+
+        return redirect(f"{reverse('admin_users')}?success=1")
+
+
+    query = request.GET.get("q", "").strip()
+    users = User.objects.all().select_related("profile").prefetch_related("profile__allowed_meal_type")
+
+    if query:
+        terms = query.split()
+        for term in terms:
+            admin_lookup = None
+            if "مدیر" in term:
+                admin_lookup = True
+            elif "کاربر" in term:
+                admin_lookup = False
+
+            conditions = (
+                Q(first_name__icontains=term)
+                | Q(last_name__icontains=term)
+                | Q(username__icontains=term)
+                | Q(email__icontains=term)
+                | Q(profile__phone_number__icontains=term)
+                | Q(profile__allowed_meal_type__title__icontains=term)
+            )
+
+            if admin_lookup is not None:
+                conditions |= Q(is_superuser=admin_lookup)
+
+            users = users.filter(conditions).distinct()
+
+    show_notification = request.GET.get("success") == "1"
+
+    return render(
+        request,
+        "admin/admin-users.html",
+        {
+            "active_page": "admin-users",
+            "users": users,
+            "meal_types": MealType.objects.all(),
+            "notification": show_notification,
+            "notification_status": True,
+            "notification_message": "کاربر با موفقیت ثبت شد!" if show_notification else "",
+        },
+    )
+
+
+@csrf_exempt
+@user_passes_test(is_admin)
+def delete_user(request, id):
+    if request.method == "POST":
+        user = get_object_or_404(User, id=id)
+        user.delete()
+        return HttpResponse(status=200)
+    return HttpResponseNotAllowed(["POST"])
 
 
 @user_passes_test(is_admin)
@@ -627,8 +741,6 @@ def admin_foods(request):
             "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
         },
     )
-
-
 @csrf_exempt
 @user_passes_test(is_admin)
 def delete_food(request, id):
@@ -680,8 +792,6 @@ def admin_drinks(request):
             "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
         },
     )
-
-
 @csrf_exempt
 @user_passes_test(is_admin)
 def delete_drink(request, id):
@@ -744,14 +854,131 @@ def delete_sidedish(request, id):
     return HttpResponseNotAllowed(["POST"])
 
 
+def flatten_item(item):
+    for key, value in item.items():
+        if isinstance(value, list):
+            for v in value:
+                yield str(v).lower()
+        else:
+            yield str(value).lower()
+            
+@csrf_exempt
 @user_passes_test(is_admin)
 def admin_daily_menu_items(request):
+    if request.method == "POST":
+        item_id = request.POST.get("id")
+        food_id = request.POST.get("food")
+        drink_id = request.POST.get("drink")
+        side_dishes_ids = request.POST.getlist("side_dishes")
+        meal_type_id = request.POST.get("meal_type")
+        quantity = request.POST.get("quantity")
+        max_quantity = request.POST.get("max_purchasable_quantity")
+        price = request.POST.get("price")
+        reservation_deadline_ts = request.POST.get("reservation_deadline")
+        expiration_ts = request.POST.get("expiration_date")
+        image = request.FILES.get("image")
+
+        print(expiration_ts)
+        print(reservation_deadline_ts)
+
+        # Convert timestamps to datetime
+        expiration_date = jdatetime.datetime.fromtimestamp(int(expiration_ts)) if expiration_ts else None
+        reservation_deadline = jdatetime.datetime.fromtimestamp(int(reservation_deadline_ts)) if reservation_deadline_ts else None
+
+        # Create or Update
+        if item_id:
+            item = get_object_or_404(DailyMenuItem, id=item_id)
+        else:
+            item = DailyMenuItem()
+
+        item.food_id = food_id
+        item.drink_id = drink_id
+        item.meal_type_id = meal_type_id or None
+        item.quantity = quantity or 0
+        item.max_purchasable_quantity = max_quantity or 0
+        item.price = price or 0
+        item.expiration_date = expiration_date
+        item.reservation_deadline = reservation_deadline
+
+        if image:
+            item.image = image
+            
+        print(item.expiration_date)
+        print(item.reservation_deadline)
+
+        item.save()
+
+        if side_dishes_ids:
+            item.side_dishes.set(side_dishes_ids)
+        else:
+            item.side_dishes.clear()
+
+        return redirect(f"{reverse('admin_daily_menu_items')}?success=1")
+    
+    items = DailyMenuItem.objects.select_related(
+        "food", "drink", "meal_type"
+    ).prefetch_related("side_dishes").all().order_by("-expiration_date")
+
+    item_list = []
+    for item in items:
+        exp_ts = int(item.expiration_date.timestamp())
+        rsrv_ts = int(item.reservation_deadline.timestamp()) if item.reservation_deadline else None
+        exp_jdt = jdatetime.datetime.fromtimestamp(exp_ts).strftime("%H:%M:%S %Y/%m/%d")
+        rsrv_jdt = jdatetime.datetime.fromtimestamp(rsrv_ts).strftime("%H:%M:%S %Y/%m/%d") if rsrv_ts else ""
+
+        item_list.append({
+            "id": item.id,
+            "food_id": item.food.id,
+            "food_title": item.food.name,
+            "drink_id": item.drink.id,
+            "drink_title": item.drink.name,
+            "side_dishes_ids": [sd.id for sd in item.side_dishes.all()],
+            "side_dishes_titles": [sd.name for sd in item.side_dishes.all()],
+            "meal_type_id": item.meal_type.id if item.meal_type else "",
+            "meal_type_title": item.meal_type.title if item.meal_type else "",
+            "price": item.price,
+            "quantity": item.quantity,
+            "max_quantity": item.max_purchasable_quantity,
+            "expiration_jalali": exp_jdt,
+            "expiration_timestamp": exp_ts,
+            "reservation_deadline_jalali": rsrv_jdt,
+            "reservation_deadline": rsrv_ts,
+            "image_url": item.image_url,
+        })
+        
+    query = request.GET.get("q", "").strip()
+    if query:
+        terms = query.split()
+        for term in terms:
+            item_list = [
+                item for item in item_list
+                if any(term in str(value).lower() for value in flatten_item(item))
+            ]
+
+    show_notification = request.GET.get("success") == "1"
     return render(
         request,
         "admin/admin-daily-menu-items.html",
-        {"active_page": "admin-daily-menu-items"},
+        {
+            "active_page": "admin-daily-menu-items",
+            "items": item_list,
+            "foods": Food.objects.all(),
+            "drinks": Drink.objects.all(),
+            "side_dishes": SideDish.objects.all(),
+            "meal_types": MealType.objects.all(),
+            "notification": show_notification,
+            "notification_status": True,
+            "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
+        },
     )
-
+@csrf_exempt
+@user_passes_test(is_admin)
+def delete_daily_menu_item(request, id):
+    if request.method == "POST":
+        daily_menu_item = get_object_or_404(DailyMenuItem, id=id)
+        daily_menu_item.delete()
+        return HttpResponse(status=200)
+    return HttpResponseNotAllowed(["POST"])
 
 @user_passes_test(is_admin)
 def admin_reservations(request):
@@ -799,6 +1026,65 @@ def admin_reservations(request):
     )
 
 
+@csrf_exempt
 @user_passes_test(is_admin)
 def admin_guests(request):
-    return render(request, "admin/admin-guests.html", {"active_page": "admin-guests"})
+    if request.method == "POST":
+        guest_id = request.POST.get("id")
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        email = request.POST.get("email", "").strip()
+        phone = request.POST.get("phone_number", "").strip()
+
+        if guest_id:  # Edit
+            guest = get_object_or_404(Guest, id=guest_id)
+            guest.first_name = first_name
+            guest.last_name = last_name
+            guest.email = email
+            guest.phone_number = phone
+            guest.save()
+        else:  # New
+            Guest.objects.create(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone_number=phone
+            )
+
+        return redirect(f"{reverse('admin_guests')}?success=1")
+
+    # GET method
+    show_notification = request.GET.get("success") == "1"
+
+    query = request.GET.get("q", "").strip()
+    guests = Guest.objects.all().order_by("-id")
+
+    if query:
+        terms = query.split()
+        for term in terms:
+            guests = guests.filter(
+                Q(first_name__icontains=term) |
+                Q(last_name__icontains=term) |
+                Q(email__icontains=term) |
+                Q(phone_number__icontains=term)
+            )
+
+    return render(
+        request,
+        "admin/admin-guests.html",
+        {
+            "active_page": "admin-guests",
+            "guests": guests,
+            "notification": show_notification,
+            "notification_status": True,
+            "notification_message": "با موفقیت ثبت شد!" if show_notification else "",
+        },
+    )
+@csrf_exempt
+@user_passes_test(is_admin)
+def delete_guest(request, id):
+    if request.method == "POST":
+        guest = get_object_or_404(Guest, id=id)
+        guest.delete()
+        return HttpResponse(status=200)
+    return HttpResponseNotAllowed(["POST"])

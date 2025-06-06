@@ -49,8 +49,8 @@
             <div class="input-container foodimage-container">
               <label>تصویر غذا:</label>
               <span>
-              <input type="file" name="image" id="food-image" accept="image/*" />
-              <img id="current-image" src="" />
+                <input type="file" name="image" id="food-image" accept="image/*" />
+                <img id="current-image" src="" />
               </span>
             </div>
 
@@ -92,11 +92,7 @@
                       data-id="{{ food.id }}" 
                       data-name="{{ food.name }}"
                       data-description="{{ food.description }}"
-                      {% if food.image %}
-                          data-image-url="{{ food.image.url }}"
-                      {% else %}
-                          data-image-url=""
-                      {% endif %}
+                      data-image-url="{{ food.image_url }}"
                       onclick="toggleAccordion(document.getElementById('food-add-edit-form-accordion'), true);">
                     <td class="date-meal-actions">
                       <i class="fas fa-edit edit-food"></i> &nbsp;&nbsp;&nbsp;

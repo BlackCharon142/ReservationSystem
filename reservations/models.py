@@ -24,7 +24,7 @@ class Status(models.Model):
 
 class Reservation(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    guest = models.ForeignKey(Guest, null=True, on_delete=models.SET_NULL)
+    guest = models.ForeignKey(Guest, null=True, blank=True, on_delete=models.SET_NULL)
     dailymenu = models.ForeignKey(DailyMenuItem, null=True, on_delete=models.SET_NULL)
     status = models.ForeignKey(Status, null=True, on_delete=models.SET_NULL)
 
