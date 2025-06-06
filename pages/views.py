@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.models import Q, Count, Case, When, IntegerField, F, Exists, OuterRef
 from collections import Counter
 
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login as auth_logout, authenticate
 from pages.forms import LoginForm, RecoveryForm
 
 from django.contrib.auth.views import LoginView
@@ -50,7 +50,7 @@ class LoginViewPage(LoginView):
 @login_required
 def logout(request):
 
-    logout(request)
+    auth_logout(request)
     return redirect("/")
 
 
