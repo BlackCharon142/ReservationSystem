@@ -4,9 +4,8 @@
 {% block extra_assets %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static "style/scancode.css" %}">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 {% endblock %}
-
-{% block header_css %}{% endblock %}
 
 {% block title %}استفاده کد{% endblock %}
 
@@ -14,19 +13,64 @@
 
 {% block content %}
   <div class="scan-container">
-    <h2 class="text" >ثبت مصرف غذا</h2>
-    <button onclick="startScan()" class="text">اسکن QR با دوربین</button>
+    <h2 class="text">ثبت مصرف غذا</h2>
+    <button onclick="toggleScanner()" class="text">اسکن QR با دوربین</button>
 
-    <form method="post" action="" id="manual-form" class="text">
+    <div id="scanner-container" style="display:none; margin-top: 20px;">
+      <div id="reader" style="width: 300px; margin: auto;"></div>
+    </div>
+
+    <form method="post" action="" id="manual-form" class="text" style="margin-top: 30px;">
       {% csrf_token %}
-      <input class="text" type="text" name="reservation_code" placeholder="یا کد را وارد کنید" required />
+      <input class="text" type="text" name="reservation_code" id="reservation_code" placeholder="یا کد را وارد کنید" required />
       <button class="text" type="submit">ثبت کد</button>
     </form>
   </div>
 
   <script>
+    let scannerStarted = false;
+    let html5QrCode;
+
+    function toggleScanner() {
+      const container = document.getElementById("scanner-container");
+      if (scannerStarted) {
+        html5QrCode.stop().then(() => {
+          container.style.display = "none";
+          scannerStarted = false;
+        });
+      } else {
+        container.style.display = "block";
+        startScan();
+      }
+    }
+
     function startScan() {
-      alert("قابلیت اسکن هنوز پیاده‌سازی نشده است. لطفاً دستی وارد کنید.");
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: 250
+        },
+        onScanSuccess,
+        onScanError
+      ).then(() => {
+        scannerStarted = true;
+      }).catch(err => {
+        alert("خطا در دسترسی به دوربین: " + err);
+      });
+    }
+
+    function onScanSuccess(qrCodeMessage) {
+      // Auto-fill input and submit
+      document.getElementById("reservation_code").value = qrCodeMessage;
+      html5QrCode.stop().then(() => {
+        document.getElementById("manual-form").submit();
+      });
+    }
+
+    function onScanError(errorMessage) {
+      // optional: console.log("Scan error", errorMessage);
     }
   </script>
 {% endblock %}

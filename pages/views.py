@@ -528,7 +528,7 @@ def scan_code(request):
             )
         except Reservation.DoesNotExist:
             messages.error(request, "کد پیدا نشد.")
-            return redirect("scan_code")
+            return redirect("scan-code")
 
         used_status = Status.objects.get(status="used")
 
