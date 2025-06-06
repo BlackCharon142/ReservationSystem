@@ -516,20 +516,28 @@ def is_admin(user):
 
 @user_passes_test(is_admin)
 def scan_code(request):
+    notification = None
+    notification_status = True
+    notification_message = ""
+
     if request.method == "POST":
         code = request.POST.get("reservation_code", "").strip()
         if not code:
-            messages.error(request, "کدی وارد نشده است.")
-            return redirect("scan_code")
+            return redirect(f"{reverse('scan-code')}?msg=کدی+وارد+نشده+است&ok=0")
 
-        try:
-            latest = Reservation.objects.filter(reservation_code=code).latest(
-                "date_status_updated"
-            )
-        except Reservation.DoesNotExist:
-            messages.error(request, "کد پیدا نشد.")
-            return redirect("scan-code")
+        # Get all logs for this reservation code
+        reservations = Reservation.objects.filter(reservation_code=code)
 
+        if not reservations.exists():
+            return redirect(f"{reverse('scan-code')}?msg=کد+پیدا+نشد&ok=0")
+
+        # If any of the logs for this code are used, canceled, or expired, reject it
+        invalid_statuses = ["used", "canceled", "expired"]
+        if reservations.filter(status__status__in=invalid_statuses).exists():
+            return redirect(f"{reverse('scan-code')}?msg=این+کد+قبلاً+استفاده+یا+لغو+شده+است&ok=0")
+
+        # Otherwise, log it as used
+        latest = reservations.latest("date_status_updated")
         used_status = Status.objects.get(status="used")
 
         Reservation.objects.create(
@@ -539,19 +547,20 @@ def scan_code(request):
             status=used_status,
             user=request.user,
         )
-        messages.success(request, "وضعیت مصرف با موفقیت ثبت شد.")
-        return redirect(f"{reverse('scan-code')}?success=1")
+        return redirect(f"{reverse('scan-code')}?msg=وضعیت+مصرف+با+موفقیت+ثبت+شد&ok=1")
 
-    show_notification = request.GET.get("success") == "1"
+    if "msg" in request.GET:
+        notification = True
+        notification_message = request.GET.get("msg")
+        notification_status = request.GET.get("ok") == "1"
+
     return render(
         request,
         "scancode.html",
         {
-                "notification": show_notification,
-                "notification_status": True,
-                "notification_message": (
-                    "کاربر با موفقیت ثبت شد!" if show_notification else ""
-                ),
+            "notification": notification,
+            "notification_status": notification_status,
+            "notification_message": notification_message,
         },
     )
 
