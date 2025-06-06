@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_assets %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "style/scancode.css" %}">
+{% endblock %}
+
+{% block header_css %}{% endblock %}
+
+{% block title %}استفاده کد{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+  <div class="scan-container">
+    <h2 class="text" >ثبت مصرف غذا</h2>
+    <button onclick="startScan()" class="text">اسکن QR با دوربین</button>
+
+    <form method="post" action="" id="manual-form" class="text">
+      {% csrf_token %}
+      <input class="text" type="text" name="reservation_code" placeholder="یا کد را وارد کنید" required />
+      <button class="text" type="submit">ثبت کد</button>
+    </form>
+  </div>
+
+  <script>
+    function startScan() {
+      alert("قابلیت اسکن هنوز پیاده‌سازی نشده است. لطفاً دستی وارد کنید.");
+    }
+  </script>
+{% endblock %}

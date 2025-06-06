@@ -3,6 +3,8 @@ from . import views
 from .views import LoginViewPage
 
 urlpatterns = [
+    path('scan-code/', views.scan_code, name='scan-code'),
+    
     path('', LoginViewPage.as_view(), name='login'),
     path('logout/', views.logout, name='logout'),
     path("user-password-recovery/", views.user_password_recovery, name="user-password-recovery"),

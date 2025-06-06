@@ -515,6 +515,48 @@ def is_admin(user):
 
 
 @user_passes_test(is_admin)
+def scan_code(request):
+    if request.method == "POST":
+        code = request.POST.get("reservation_code", "").strip()
+        if not code:
+            messages.error(request, "کدی وارد نشده است.")
+            return redirect("scan_code")
+
+        try:
+            latest = Reservation.objects.filter(reservation_code=code).latest(
+                "date_status_updated"
+            )
+        except Reservation.DoesNotExist:
+            messages.error(request, "کد پیدا نشد.")
+            return redirect("scan_code")
+
+        used_status = Status.objects.get(status="used")
+
+        Reservation.objects.create(
+            reservation_code=latest.reservation_code,
+            guest=latest.guest,
+            dailymenu=latest.dailymenu,
+            status=used_status,
+            user=request.user,
+        )
+        messages.success(request, "وضعیت مصرف با موفقیت ثبت شد.")
+        return redirect(f"{reverse('scan-code')}?success=1")
+
+    show_notification = request.GET.get("success") == "1"
+    return render(
+        request,
+        "scancode.html",
+        {
+                "notification": show_notification,
+                "notification_status": True,
+                "notification_message": (
+                    "کاربر با موفقیت ثبت شد!" if show_notification else ""
+                ),
+        },
+    )
+
+
+@user_passes_test(is_admin)
 def admin(request):
     return redirect("/")
 
@@ -528,24 +570,32 @@ def admin_dashboard(request):
         .prefetch_related("dailymenu__side_dishes")
         .order_by("-date_status_updated")[:50]
     )
-    
+
     now = jdatetime.datetime.now()
 
     # Step 1: get all codes that are canceled/used/expired
-    invalid_codes = Reservation.objects.filter(
-        status__status__in=["canceled", "used", "expired"]
-    ).values_list("reservation_code", flat=True).distinct()
-    
+    invalid_codes = (
+        Reservation.objects.filter(status__status__in=["canceled", "used", "expired"])
+        .values_list("reservation_code", flat=True)
+        .distinct()
+    )
+
     print(invalid_codes)
 
     # Step 2: filter valid reservations
-    active_reservations = Reservation.objects.select_related(
-        "guest", "status", "dailymenu__food", "dailymenu__drink"
-    ).prefetch_related("dailymenu__side_dishes").filter(
-        status__status="reserved",
-        dailymenu__expiration_date__gt=now,
-        guest__isnull=False
-    ).exclude(reservation_code__in=invalid_codes).order_by("dailymenu__expiration_date")
+    active_reservations = (
+        Reservation.objects.select_related(
+            "guest", "status", "dailymenu__food", "dailymenu__drink"
+        )
+        .prefetch_related("dailymenu__side_dishes")
+        .filter(
+            status__status="reserved",
+            dailymenu__expiration_date__gt=now,
+            guest__isnull=False,
+        )
+        .exclude(reservation_code__in=invalid_codes)
+        .order_by("dailymenu__expiration_date")
+    )
 
     # Step 3: generate QR codes
     for res in active_reservations:

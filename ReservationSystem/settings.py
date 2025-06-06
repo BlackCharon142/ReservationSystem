@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'menu_items',
     'daily_menus',
     'users',
-    'reservations',
+    'reservations'
 ]
 
 MIDDLEWARE = [
