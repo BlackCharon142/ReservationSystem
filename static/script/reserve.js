@@ -99,12 +99,11 @@ function updateCounters(){
             if (item.max_qty > 0) {
               // subtract already reserved from remaining stock?
               // if you want `max` to be "how many more they can add":
-              const remaining = item.max_qty - item.reserved_count;
               html += `
                 <div
                   class="counter"
                   data-min="0"
-                  data-max="${remaining}"
+                  data-max="${item.max_qty}"
                   data-current="${item.reserved_count}"
                 >
                   <button class="decrement">-</button>

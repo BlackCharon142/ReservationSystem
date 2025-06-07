@@ -29,6 +29,7 @@
       </div>
       <div class="menu-item">
         <button class="{% if active_page == 'admin-dashboard' %}active{% endif %}" onclick="window.location.assign('{% url 'admin_dashboard' %}');">صفحه اصلی</button>
+        <button onclick="window.location.assign('{% url 'scan-code' %}');">صفحه اسکن کد</button>
       </div>
       <div class="menu-item">
         <h3>تنظیمات کاربران</h3>
@@ -46,6 +47,9 @@
         <button class="{% if active_page == 'admin-daily-menu-items' %}active{% endif %}" onclick="window.location.assign('{% url 'admin_daily_menu_items' %}');">منوی روزانه</button>
         <button class="{% if active_page == 'admin-reservations' %}active{% endif %}" onclick="window.location.assign('{% url 'admin_reservations' %}');">گزارش رزرو ها</button>
         <button class="{% if active_page == 'admin-guests' %}active{% endif %}" onclick="window.location.assign('{% url 'admin_guests' %}');">رزرو میهمان</button>
+      </div>
+      <div class="menu-item">
+        <button class="logout-button" onclick="window.location.assign('{% url 'logout' %}');">خروج</button>
       </div>
     </div>
     <div class="main-section">

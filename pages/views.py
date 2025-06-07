@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Q, Count, Case, When, IntegerField, F, Exists, OuterRef
 from collections import Counter
+from itertools import chain
 
 from django.contrib.auth import login, authenticate, logout as auth_logout
 from pages.forms import LoginForm, RecoveryForm
@@ -232,7 +233,6 @@ def get_meals_by_timestamp(request):
         expiration_date__date=date,
         meal_type__in=request.user.profile.allowed_meal_type.all(),
     )
-    print(request.user.profile.allowed_meal_type.all())
 
     # compute net reserved vs canceled for this user & date
     reservations = (
@@ -257,7 +257,7 @@ def get_meals_by_timestamp(request):
 
     # chosen “now” for deadline checks
     now_aware = timezone.make_aware(
-        jdatetime.datetime.now().togregorian(), timezone.get_current_timezone()
+        jdatetime.datetime.now(), timezone.get_current_timezone()
     )
 
     meal_data = []
@@ -363,6 +363,7 @@ def ajax_reserve(request):
             dailymenu=menu_item,
             status=reserved_status,
             reservation_code=code,
+            date_status_updated = jdatetime.datetime.now()
         )
 
     return JsonResponse({"success": True, "new_qty": menu_item.quantity, "code": code})
@@ -440,6 +441,7 @@ def ajax_cancel(request):
             dailymenu=menu_item,
             status=canceled_status,
             reservation_code=code_to_cancel,
+            date_status_updated = jdatetime.datetime.now()
         )
 
     return JsonResponse(
@@ -545,7 +547,8 @@ def scan_code(request):
             guest=latest.guest,
             dailymenu=latest.dailymenu,
             status=used_status,
-            user=request.user,
+            user=latest.user,
+            date_status_updated = jdatetime.datetime.now()
         )
         return redirect(f"{reverse('scan-code')}?msg=وضعیت+مصرف+با+موفقیت+ثبت+شد&ok=1")
 
@@ -1120,38 +1123,47 @@ def delete_daily_menu_item(request, id):
 @user_passes_test(is_admin)
 def admin_reservations(request):
     query = request.GET.get("q", "").strip()
-    reservations = Reservation.objects.select_related(
+
+    base_qs = Reservation.objects.select_related(
         "user", "status", "dailymenu__food", "dailymenu__drink", "guest"
-    ).prefetch_related("dailymenu__side_dishes")
+    ).prefetch_related("dailymenu__side_dishes").order_by('-date_status_updated')
 
-    if query:
-        terms = query.split()
-        for term in terms:
-            status_value = {
-                "رزرو شده": "reserved",
-                "مصرف شده": "used",
-                "کنسل شده": "canceled",
-                "منقضی شده": "expired",
-            }.get(term)
+    terms = query.split()
 
-            filters = (
-                Q(user__first_name__icontains=term)
-                | Q(user__last_name__icontains=term)
-                | Q(user__username__icontains=term)
-                | Q(user__email__icontains=term)
-                | Q(reservation_code__icontains=term)
-                | Q(status__title__icontains=term)
-                | Q(dailymenu__food__name__icontains=term)
-                | Q(dailymenu__drink__name__icontains=term)
-                | Q(dailymenu__side_dishes__name__icontains=term)
-            )
+    # --- ORM filtering ---
+    orm_filter = Q()
+    for term in terms:
+        status_value = {
+            "رزرو شده": "reserved",
+            "مصرف شده": "used",
+            "کنسل شده": "canceled",
+            "منقضی شده": "expired",
+        }.get(term)
 
-            if status_value:
-                filters |= Q(status__status__iexact=status_value)
+        orm_filter |= Q(user__first_name__icontains=term)
+        orm_filter |= Q(user__last_name__icontains=term)
+        orm_filter |= Q(user__username__icontains=term)
+        orm_filter |= Q(user__email__icontains=term)
+        orm_filter |= Q(reservation_code__icontains=term)
+        orm_filter |= Q(status__title__icontains=term)
+        orm_filter |= Q(dailymenu__food__name__icontains=term)
+        orm_filter |= Q(dailymenu__drink__name__icontains=term)
+        orm_filter |= Q(dailymenu__side_dishes__name__icontains=term)
 
-            reservations = reservations.filter(filters)
+        if status_value:
+            orm_filter |= Q(status__status__iexact=status_value)
 
-        reservations = reservations.distinct()
+    qs_orm = base_qs.filter(orm_filter)
+
+    # --- Jalali date filtering ---
+    qs_jalali = []
+    for res in base_qs:
+        jalali_str = jdatetime.datetime.fromgregorian(datetime=res.date_status_updated).strftime("%Y/%m/%d %H:%M:%S")
+        if any(term in jalali_str for term in terms):
+            qs_jalali.append(res)
+
+    # --- Combine and deduplicate ---
+    reservations = list({r.id: r for r in chain(qs_orm, qs_jalali)}.values())
 
     return render(
         request,
@@ -1278,18 +1290,32 @@ def admin_guests(request):
 
     if query:
         terms = query.split()
+    
+        # --- ORM Filtering ---
+        orm_filter = Q()
         for term in terms:
-            reservations = reservations.filter(
-                Q(reservation_code__icontains=term)
-                | Q(guest__first_name__icontains=term)
-                | Q(guest__last_name__icontains=term)
-                | Q(guest__email__icontains=term)
-                | Q(guest__phone_number__icontains=term)
-                | Q(dailymenu__food__name__icontains=term)
-                | Q(dailymenu__drink__name__icontains=term)
-                | Q(dailymenu__side_dishes__name__icontains=term)
-                | Q(status__title__icontains=term)
-            ).distinct()
+            orm_filter |= Q(reservation_code__icontains=term)
+            orm_filter |= Q(guest__first_name__icontains=term)
+            orm_filter |= Q(guest__last_name__icontains=term)
+            orm_filter |= Q(guest__email__icontains=term)
+            orm_filter |= Q(guest__phone_number__icontains=term)
+            orm_filter |= Q(dailymenu__food__name__icontains=term)
+            orm_filter |= Q(dailymenu__drink__name__icontains=term)
+            orm_filter |= Q(dailymenu__side_dishes__name__icontains=term)
+            orm_filter |= Q(status__title__icontains=term)
+    
+        orm_matches = reservations.filter(orm_filter).distinct()
+    
+        # --- Jalali Date Matching ---
+        jalali_matches = []
+        for r in reservations:
+            jalali_str = jdatetime.datetime.fromgregorian(datetime=r.date_status_updated).strftime("%Y/%m/%d %H:%M:%S")
+            if any(term in jalali_str for term in terms):
+                jalali_matches.append(r)
+    
+        # --- Merge & Deduplicate ---
+        reservations = list({r.id: r for r in chain(orm_matches, jalali_matches)}.values())
+        reservations.sort(key=lambda r: r.date_status_updated, reverse=True)
 
     reservation_list = []
     for r in reservations:
