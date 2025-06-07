@@ -592,8 +592,6 @@ def admin_dashboard(request):
         .distinct()
     )
 
-    print(invalid_codes)
-
     # Step 2: filter valid reservations
     active_reservations = (
         Reservation.objects.select_related(
@@ -993,9 +991,6 @@ def admin_daily_menu_items(request):
         expiration_ts = request.POST.get("expiration_date")
         image = request.FILES.get("image")
 
-        print(expiration_ts)
-        print(reservation_deadline_ts)
-
         # Convert timestamps to datetime
         expiration_date = (
             jdatetime.datetime.fromtimestamp(int(expiration_ts))
@@ -1025,9 +1020,6 @@ def admin_daily_menu_items(request):
 
         if image:
             item.image = image
-
-        print(item.expiration_date)
-        print(item.reservation_deadline)
 
         item.save()
 
