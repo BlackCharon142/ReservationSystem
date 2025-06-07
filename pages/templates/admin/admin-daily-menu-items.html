@@ -163,7 +163,7 @@
             <div class="reservation-log-list">
               <table width="100%" cellspacing="0" cellpadding="0">
                 {% for item in items %}
-                  <tr class="reservation-log-row" data-id="{{ item.id }}" data-reservation-deadline="{{ item.reservation_deadline }}" data-expiration="{{ item.expiration_timestamp }}" data-food="{{ item.food_id }}" data-drink="{{ item.drink_id }}" data-sides="{{ item.side_dishes_ids }}" data-meal-type="{{ item.meal_type_id }}" data-price="{{ item.price }}" data-quantity="{{ item.quantity }}" data-max="{{ item.max_quantity }}" data-image-url="{{ item.image_url }}" onclick="toggleAccordion(document.getElementById('daily-menu-add-edit-form-accordion'), true);">
+                  <tr class="reservation-log-row" data-id="{{ item.id }}" data-reservation-deadline-ts="{{ item.reservation_deadline }}" data-reservation-deadline="{{ item.reservation_deadline_jalali }}" data-expiration-ts="{{ item.expiration_timestamp }}" data-expiration="{{ item.expiration_jalali }}" data-food="{{ item.food_id }}" data-drink="{{ item.drink_id }}" data-sides="{{ item.side_dishes_ids }}" data-meal-type="{{ item.meal_type_id }}" data-price="{{ item.price }}" data-quantity="{{ item.quantity }}" data-max="{{ item.max_quantity }}" data-image-url="{{ item.image_url }}" onclick="toggleAccordion(document.getElementById('daily-menu-add-edit-form-accordion'), true);">
                     <td class="date-meal-actions">
                       <i class="fas fa-edit edit-daily-menu" data-id="{{ item.id }}"></i>&nbsp;&nbsp;&nbsp;
                       <i class="fas fa-trash delete-daily-menu" data-id="{{ item.id }}"></i>

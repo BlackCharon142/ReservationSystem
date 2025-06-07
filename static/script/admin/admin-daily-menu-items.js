@@ -26,20 +26,23 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelector("input#price").value = row.dataset.price;
 
             // Reservation Deadline and Expiration
-            const rsrvTimestamp = row.dataset.reservationDeadline;
-            const expTimestamp = row.dataset.expiration;
+            const rsrvTimestamp = row.dataset.reservationDeadlineTs;
+            const expTimestamp = row.dataset.expirationTs;
+
+            const rsrvTime = row.dataset.reservationDeadline;
+            const expTime = row.dataset.expiration;
 
             const rsrvInput = document.querySelector("input#reservation_deadline_display");
             const expInput = document.querySelector("input#expiration_date_display");
 
             if (rsrvInput && rsrvTimestamp) {
                 rsrvInput.setAttribute("data-timestamp", rsrvTimestamp);
-                rsrvInput.value = row.querySelector("td:nth-child(2)").innerText; // already formatted Jalali
+                rsrvInput.value = rsrvTime; // already formatted Jalali
             }
 
             if (expInput && expTimestamp) {
                 expInput.setAttribute("data-timestamp", expTimestamp);
-                expInput.value = row.querySelector("td:nth-child(2)").innerText;
+                expInput.value = expTime;
             }
 
             const imgPreview = document.getElementById("current-image");
